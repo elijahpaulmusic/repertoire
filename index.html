@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elijah Paul – Build Your Setlist</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Open+Sans+Condensed:wght@300;400;700&family=DM+Mono:wght@400&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --ink: #1a1a1a; --paper: #f8f6f1; --cream: #eeeae0; --gold: #b8963e;
@@ -13,7 +13,7 @@
     --success: #3a7d54;
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.5; }
+  body { font-family: 'Open Sans Condensed', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.5; }
 
   /* ── GENERATOR ── */
   #generator-view { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; background: var(--ink); }
@@ -23,10 +23,10 @@
   .gen-sub { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
   .field-label { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .field-group { margin-bottom: 24px; }
-  input[type="text"], select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--white); color: var(--ink); outline: none; transition: border-color 0.15s; }
+  input[type="text"], select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 15px; background: var(--white); color: var(--ink); outline: none; transition: border-color 0.15s; }
   input[type="text"]:focus, select:focus { border-color: var(--gold); }
   .duration-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .gen-btn { width: 100%; padding: 14px; background: var(--gold); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: background 0.15s; margin-bottom: 16px; }
+  .gen-btn { width: 100%; padding: 14px; background: var(--gold); color: var(--white); border: none; border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.05em; cursor: pointer; transition: background 0.15s; margin-bottom: 16px; }
   .gen-btn:hover { background: var(--gold-light); }
   .gen-btn-secondary { background: transparent; border: 1.5px solid var(--border); color: var(--ink); margin-bottom: 0; }
   .gen-btn-secondary:hover { background: var(--cream); }
@@ -34,7 +34,7 @@
   .link-output.visible { display: block; }
   .link-output-label { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .link-url { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); word-break: break-all; margin-bottom: 12px; }
-  .copy-btn { padding: 8px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: opacity 0.15s; }
+  .copy-btn { padding: 8px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; cursor: pointer; transition: opacity 0.15s; }
   .copy-btn:hover { opacity: 0.8; }
   .copy-btn.copied { background: var(--success); }
   .gen-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
@@ -65,14 +65,14 @@
   .app-layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 64px); }
   .browser { padding: 28px 32px; border-right: 1px solid var(--border); overflow-y: auto; }
   .tabs { display: flex; border-bottom: 1.5px solid var(--border); margin-bottom: 24px; }
-  .tab-btn { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1.5px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; color: var(--muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
+  .tab-btn { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1.5px; font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
   .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
   .search-wrap { position: relative; margin-bottom: 20px; }
   .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-  .search-input { width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: var(--white); outline: none; transition: border-color 0.15s; }
+  .search-input { width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 14px; background: var(--white); outline: none; transition: border-color 0.15s; }
   .search-input:focus { border-color: var(--gold); }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-  .filter-chip { padding: 5px 12px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--white); font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .filter-chip { padding: 5px 12px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--white); font-family: 'Open Sans Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .filter-chip.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
   .song-list { display: flex; flex-direction: column; gap: 2px; }
   .song-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 3px; cursor: pointer; transition: background 0.1s; border: 1.5px solid transparent; }
@@ -95,7 +95,7 @@
   .custom-request-box p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
   .custom-row { display: flex; gap: 8px; }
   .custom-row input { flex: 1; }
-  .custom-add-btn { padding: 10px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .custom-add-btn { padding: 10px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
   .custom-add-btn:hover { opacity: 0.8; }
   .setlist-panel { display: flex; flex-direction: column; background: var(--white); border-left: 1px solid var(--border); position: sticky; top: 64px; height: calc(100vh - 64px); overflow: hidden; }
   .setlist-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
@@ -125,7 +125,7 @@
   .remove-btn { width: 22px; height: 22px; border-radius: 50%; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 16px; flex-shrink: 0; transition: color 0.1s, background 0.1s; line-height: 1; }
   .remove-btn:hover { color: #e05c4a; background: #fdf0ee; border-radius: 50%; }
   .setlist-footer { padding: 16px 20px; border-top: 1px solid var(--border); background: var(--paper); }
-  .export-btn { width: 100%; padding: 12px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; margin-bottom: 8px; letter-spacing: 0.03em; }
+  .export-btn { width: 100%; padding: 12px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-bottom: 8px; letter-spacing: 0.03em; }
   .export-btn:hover { opacity: 0.8; }
   .export-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .export-note { font-size: 11px; color: var(--muted); text-align: center; }
@@ -269,7 +269,7 @@
       </div>
       <div class="setlist-footer">
         <button class="export-btn" id="export-btn" onclick="exportSetlist()" disabled>Copy Setlist to Clipboard</button>
-        <div class="export-note">Paste directly into your email or form</div>
+        <div class="export-note">Paste directly into your email and send to Elijah!</div>
       </div>
     </div>
   </div>
@@ -511,7 +511,7 @@ let REPERTOIRE = [
   { title: "Sorry! (I Didn't Know)", artist: "Monsta Boy", genre: "Garage", dur: 210 },
 ];
 
-const GENRE_ORDER = ["Soul & Motown","Jazz","Chilled","Pop / Upbeat","House & Ibiza","Garage"];
+const GENRE_ORDER = ["Chilled","Pop / Upbeat","Soul & Motown","House & Ibiza","Garage","Jazz"];
 
 // ─────────────────────────────────────────────
 // STATE
