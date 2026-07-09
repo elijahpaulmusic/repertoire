@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elijah Paul – Build Your Setlist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1a1a; --paper: #f8f6f1; --cream: #eeeae0; --gold: #b8963e;
+    --gold-light: #d4ae60; --muted: #7a7468; --border: #d8d3c8; --white: #ffffff;
+    --success: #3a7d54;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.5; }
+
+  /* ── GENERATOR ── */
+  #generator-view { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; background: var(--ink); }
+  .gen-card { background: var(--paper); border-radius: 4px; padding: 48px 40px; max-width: 560px; width: 100%; }
+  .gen-logo { font-family: 'Playfair Display', serif; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .gen-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; line-height: 1.2; }
+  .gen-sub { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .field-group { margin-bottom: 24px; }
+  input[type="text"], select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--white); color: var(--ink); outline: none; transition: border-color 0.15s; }
+  input[type="text"]:focus, select:focus { border-color: var(--gold); }
+  .duration-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .gen-btn { width: 100%; padding: 14px; background: var(--gold); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: background 0.15s; margin-bottom: 16px; }
+  .gen-btn:hover { background: var(--gold-light); }
+  .gen-btn-secondary { background: transparent; border: 1.5px solid var(--border); color: var(--ink); margin-bottom: 0; }
+  .gen-btn-secondary:hover { background: var(--cream); }
+  .link-output { display: none; margin-top: 20px; padding: 16px; background: var(--cream); border-radius: 3px; border: 1px solid var(--border); }
+  .link-output.visible { display: block; }
+  .link-output-label { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .link-url { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); word-break: break-all; margin-bottom: 12px; }
+  .copy-btn { padding: 8px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: opacity 0.15s; }
+  .copy-btn:hover { opacity: 0.8; }
+  .copy-btn.copied { background: var(--success); }
+  .gen-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* Admin tools */
+  .admin-section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .admin-log { margin-top: 14px; background: var(--ink); border-radius: 3px; padding: 14px; font-family: 'DM Mono', monospace; font-size: 11px; color: #aaa; max-height: 180px; overflow-y: auto; display: none; line-height: 1.8; }
+  .admin-log.visible { display: block; }
+  .log-ok { color: #7ec99a; }
+  .log-warn { color: #e0b060; }
+  .log-err { color: #e07060; }
+
+  /* ── CLIENT VIEW ── */
+  #client-view { display: none; }
+  header { background: var(--ink); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+  .header-brand { font-family: 'Playfair Display', serif; color: var(--white); font-size: 17px; }
+  .header-brand span { color: var(--gold); }
+  .header-meta { display: flex; align-items: center; gap: 24px; }
+  .header-client { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .header-client strong { color: var(--white); font-weight: 500; }
+  .time-pill { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 100px; padding: 6px 14px; font-size: 13px; color: var(--white); }
+  .time-pill .used { color: var(--gold-light); font-weight: 500; }
+  .time-pill .sep { color: rgba(255,255,255,0.3); }
+  .time-pill .total { color: rgba(255,255,255,0.7); }
+  .time-pill-bar { width: 60px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+  .time-pill-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.3s, background 0.3s; }
+  .time-pill-fill.over { background: #e05c4a; }
+  .app-layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 64px); }
+  .browser { padding: 28px 32px; border-right: 1px solid var(--border); overflow-y: auto; }
+  .tabs { display: flex; border-bottom: 1.5px solid var(--border); margin-bottom: 24px; }
+  .tab-btn { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1.5px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; color: var(--muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+  .search-wrap { position: relative; margin-bottom: 20px; }
+  .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search-input { width: 100%; padding: 11px 14px 11px 40px; border: 1.5px solid var(--border); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 14px; background: var(--white); outline: none; transition: border-color 0.15s; }
+  .search-input:focus { border-color: var(--gold); }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .filter-chip { padding: 5px 12px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--white); font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .filter-chip.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+  .song-list { display: flex; flex-direction: column; gap: 2px; }
+  .song-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 3px; cursor: pointer; transition: background 0.1s; border: 1.5px solid transparent; }
+  .song-item:hover { background: var(--cream); }
+  .song-item.in-setlist { background: #f0f7f3; border-color: #b8dcc8; }
+  .song-info { flex: 1; min-width: 0; }
+  .song-title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .song-artist { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .song-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 12px; }
+  .song-duration { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); width: 32px; text-align: right; }
+  .add-btn { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; font-size: 16px; line-height: 1; color: var(--muted); }
+  .add-btn:hover { border-color: var(--gold); color: var(--gold); background: #fdf8ee; }
+  .add-btn.added { background: var(--success); border-color: var(--success); color: var(--white); font-size: 14px; }
+  .section-header { font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: var(--muted); padding: 16px 14px 8px; letter-spacing: 0.03em; border-top: 1px solid var(--border); margin-top: 8px; }
+  .section-header:first-child { border-top: none; margin-top: 0; }
+  .search-results-info { font-size: 13px; color: var(--muted); margin-bottom: 12px; min-height: 20px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .custom-request-box { margin-top: 24px; padding: 16px; border: 1.5px dashed var(--border); border-radius: 3px; }
+  .custom-request-box p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .custom-row { display: flex; gap: 8px; }
+  .custom-row input { flex: 1; }
+  .custom-add-btn { padding: 10px 16px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .custom-add-btn:hover { opacity: 0.8; }
+  .setlist-panel { display: flex; flex-direction: column; background: var(--white); border-left: 1px solid var(--border); position: sticky; top: 64px; height: calc(100vh - 64px); overflow: hidden; }
+  .setlist-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+  .setlist-title { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 4px; }
+  .setlist-count { font-size: 12px; color: var(--muted); }
+  .setlist-time-bar { padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--paper); }
+  .time-bar-labels { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .time-bar-used { font-weight: 500; }
+  .time-bar-limit { color: var(--muted); }
+  .time-bar-track { height: 6px; background: var(--cream); border-radius: 3px; overflow: hidden; }
+  .time-bar-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width 0.3s, background 0.3s; }
+  .time-bar-fill.warning { background: #e09a3a; }
+  .time-bar-fill.over { background: #e05c4a; }
+  .time-remaining { font-size: 11px; color: var(--muted); margin-top: 5px; text-align: right; }
+  .time-remaining.over { color: #e05c4a; font-weight: 500; }
+  .setlist-items { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .setlist-empty { padding: 40px 24px; text-align: center; color: var(--muted); }
+  .setlist-empty-icon { font-size: 32px; margin-bottom: 12px; }
+  .setlist-empty p { font-size: 13px; line-height: 1.6; }
+  .setlist-item { display: flex; align-items: center; padding: 10px 20px; gap: 10px; border-bottom: 1px solid var(--cream); transition: background 0.1s; }
+  .setlist-item:hover { background: var(--paper); }
+  .setlist-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); width: 18px; flex-shrink: 0; text-align: right; }
+  .setlist-item-info { flex: 1; min-width: 0; }
+  .setlist-item-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .setlist-item-artist { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .setlist-item-dur { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .remove-btn { width: 22px; height: 22px; border-radius: 50%; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 16px; flex-shrink: 0; transition: color 0.1s, background 0.1s; line-height: 1; }
+  .remove-btn:hover { color: #e05c4a; background: #fdf0ee; border-radius: 50%; }
+  .setlist-footer { padding: 16px 20px; border-top: 1px solid var(--border); background: var(--paper); }
+  .export-btn { width: 100%; padding: 12px; background: var(--ink); color: var(--white); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; margin-bottom: 8px; letter-spacing: 0.03em; }
+  .export-btn:hover { opacity: 0.8; }
+  .export-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .export-note { font-size: 11px; color: var(--muted); text-align: center; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--white); padding: 10px 20px; border-radius: 100px; font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .no-results { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  @media (max-width: 768px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .setlist-panel { position: fixed; bottom: 0; left: 0; right: 0; height: auto; max-height: 50vh; top: auto; border-top: 2px solid var(--border); z-index: 90; }
+    .setlist-items { max-height: 200px; }
+    .browser { padding-bottom: 260px; }
+    header { padding: 0 16px; }
+    .header-meta { gap: 12px; }
+    .browser { padding: 20px 16px; }
+    .gen-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── ADMIN / LINK GENERATOR ── -->
+<div id="generator-view">
+  <div class="gen-card">
+    <div class="gen-logo">Elijah Paul Music</div>
+    <div class="gen-title">Generate a Client Setlist Link</div>
+    <p class="gen-sub">Create a personalised link to send to your client — they'll see their name and time limit automatically.</p>
+
+    <div class="field-group">
+      <label class="field-label">Client Name</label>
+      <input type="text" id="gen-name" placeholder="e.g. Sarah & Tom" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">Set Duration</label>
+      <div class="duration-row">
+        <select id="gen-hours">
+          <option value="0">0 hours</option>
+          <option value="1">1 hour</option>
+          <option value="2">2 hours</option>
+          <option value="3">3 hours</option>
+        </select>
+        <select id="gen-mins">
+          <option value="0">0 min</option>
+          <option value="15">15 min</option>
+          <option value="20">20 min</option>
+          <option value="25">25 min</option>
+          <option value="30">30 min</option>
+          <option value="35">35 min</option>
+          <option value="40">40 min</option>
+          <option value="45" selected>45 min</option>
+          <option value="50">50 min</option>
+          <option value="55">55 min</option>
+        </select>
+      </div>
+    </div>
+    <button class="gen-btn" onclick="generateLink()">Generate Client Link</button>
+
+    <div class="link-output" id="link-output">
+      <div class="link-output-label">Client Link</div>
+      <div class="link-url" id="link-url-display"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy Link</button>
+    </div>
+
+    <hr class="gen-divider">
+
+    <!-- Admin Tools -->
+    <div class="admin-section-label">Admin Tools</div>
+
+    <button class="gen-btn gen-btn-secondary" onclick="runFetchDurations()">
+      🎵 Fetch Exact Durations from iTunes
+    </button>
+    <button class="gen-btn gen-btn-secondary" style="margin-top:10px" onclick="runUpdateRepertoire()">
+      🔄 Update Repertoire from elijahpaul.com
+    </button>
+
+    <div class="admin-log" id="admin-log"></div>
+  </div>
+</div>
+
+<!-- ── CLIENT SETLIST BUILDER ── -->
+<div id="client-view">
+  <header>
+    <div class="header-brand">Elijah Paul <span>Saxophonist</span></div>
+    <div class="header-meta">
+      <div class="header-client">Setlist for <strong id="header-client-name"></strong></div>
+      <div class="time-pill">
+        <span class="used" id="pill-used">0:00</span>
+        <span class="sep">/</span>
+        <span class="total" id="pill-total">45:00</span>
+        <div class="time-pill-bar"><div class="time-pill-fill" id="pill-fill"></div></div>
+      </div>
+    </div>
+  </header>
+  <div class="app-layout">
+    <div class="browser">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-repertoire" onclick="switchTab('repertoire')">My Repertoire</button>
+        <button class="tab-btn" id="tab-search" onclick="switchTab('search')">Search Any Song</button>
+      </div>
+      <div id="pane-repertoire">
+        <div class="search-wrap">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" id="rep-search" placeholder="Search repertoire…" oninput="renderRepertoire()" />
+        </div>
+        <div class="filters" id="rep-filters"></div>
+        <div class="song-list" id="rep-list"></div>
+      </div>
+      <div id="pane-search" style="display:none">
+        <div class="search-wrap">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" id="ext-search" placeholder="Search by song or artist…" oninput="debounceSearch()" />
+        </div>
+        <div class="search-results-info" id="search-info">Type to search for any song</div>
+        <div class="song-list" id="ext-list"></div>
+        <div class="custom-request-box">
+          <p>Can't find a specific version? Add a custom request:</p>
+          <div class="custom-row">
+            <input type="text" id="custom-title" placeholder="Song title – Artist" />
+            <button class="custom-add-btn" onclick="addCustomRequest()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="setlist-panel">
+      <div class="setlist-header">
+        <div class="setlist-title">Your Setlist</div>
+        <div class="setlist-count" id="setlist-count">0 songs</div>
+      </div>
+      <div class="setlist-time-bar">
+        <div class="time-bar-labels">
+          <span class="time-bar-used" id="bar-used">0:00 added</span>
+          <span class="time-bar-limit" id="bar-limit">of 45:00 set</span>
+        </div>
+        <div class="time-bar-track"><div class="time-bar-fill" id="bar-fill"></div></div>
+        <div class="time-remaining" id="time-remaining">45:00 remaining</div>
+      </div>
+      <div class="setlist-items" id="setlist-items">
+        <div class="setlist-empty">
+          <div class="setlist-empty-icon">🎷</div>
+          <p>Your setlist is empty.<br>Browse the repertoire or search for songs above.</p>
+        </div>
+      </div>
+      <div class="setlist-footer">
+        <button class="export-btn" id="export-btn" onclick="exportSetlist()" disabled>Copy Setlist to Clipboard</button>
+        <div class="export-note">Paste directly into your email or form</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// REPERTOIRE DATA — durations fetched from iTunes
+// Jazz standards: all set to 4:00 (240s) per request
+// ─────────────────────────────────────────────
+let REPERTOIRE = [
+  // Soul & Motown
+  { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", genre: "Soul & Motown", dur: 251 },
+  { title: "The Best", artist: "Diana Ross", genre: "Soul & Motown", dur: 229 },
+  { title: "Dancin' In The Street", artist: "Martha and The Vandellas", genre: "Soul & Motown", dur: 148 },
+  { title: "Don't You Worry 'Bout A Thing", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 252 },
+  { title: "Get Ready", artist: "The Temptations", genre: "Soul & Motown", dur: 160 },
+  { title: "Give Me The Night", artist: "George Benson", genre: "Soul & Motown", dur: 248 },
+  { title: "Happy Birthday", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 391 },
+  { title: "I Heard It Through The Grapevine", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 230 },
+  { title: "I'm Coming Out", artist: "Diana Ross", genre: "Soul & Motown", dur: 212 },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 375 },
+  { title: "I Wish", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 246 },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Soul & Motown", dur: 325 },
+  { title: "Let's Stay Together", artist: "Al Green", genre: "Soul & Motown", dur: 199 },
+  { title: "Lovely Day", artist: "Bill Withers", genre: "Soul & Motown", dur: 261 },
+  { title: "Master Blaster (Jammin')", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 340 },
+  { title: "Move On Up", artist: "Curtis Mayfield", genre: "Soul & Motown", dur: 441 },
+  { title: "Never Too Much", artist: "Luther Vandross", genre: "Soul & Motown", dur: 210 },
+  { title: "Play That Funky Music", artist: "Wild Cherry", genre: "Soul & Motown", dur: 344 },
+  { title: "Reach Out (I'll Be There)", artist: "Four Tops", genre: "Soul & Motown", dur: 175 },
+  { title: "Rock With You", artist: "Michael Jackson", genre: "Soul & Motown", dur: 219 },
+  { title: "September", artist: "Earth, Wind & Fire", genre: "Soul & Motown", dur: 215 },
+  { title: "Signed, Sealed, Delivered", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 162 },
+  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 230 },
+  { title: "Smooth Operator", artist: "Sade", genre: "Soul & Motown", dur: 283 },
+  { title: "Stop! In The Name of Love", artist: "The Supremes", genre: "Soul & Motown", dur: 171 },
+  { title: "Sweet Love", artist: "Anita Baker", genre: "Soul & Motown", dur: 270 },
+  { title: "Thinking of You", artist: "Sister Sledge", genre: "Soul & Motown", dur: 237 },
+  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Soul & Motown", dur: 185 },
+  { title: "What a Wonderful World", artist: "Louis Armstrong", genre: "Soul & Motown", dur: 138 },
+  { title: "What's Going On", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 235 },
+  { title: "You Can't Hurry Love", artist: "The Supremes", genre: "Soul & Motown", dur: 165 },
+
+  // Jazz — all 4:00 as requested
+  { title: "A Night In Tunisia", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Afternoon In Paris", artist: "", genre: "Jazz", dur: 240 },
+  { title: "All Blues", artist: "", genre: "Jazz", dur: 240 },
+  { title: "All of Me", artist: "", genre: "Jazz", dur: 240 },
+  { title: "All The Things You Are", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Autumn Leaves", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Beautiful Love", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Black Orpheus", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Blue Bossa", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Bye Bye Blackbird", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Days of Wine and Roses", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Doxy", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Fly Me To The Moon", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Footprints", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Four", artist: "", genre: "Jazz", dur: 240 },
+  { title: "How High The Moon", artist: "", genre: "Jazz", dur: 240 },
+  { title: "In A Sentimental Mood", artist: "", genre: "Jazz", dur: 240 },
+  { title: "It Could Happen To You", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Just Friends", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Ladybird", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Little Sunflower", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Lullaby Of Birdland", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Misty", artist: "", genre: "Jazz", dur: 240 },
+  { title: "My Little Suede Shoes", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Night and Day", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Oleo", artist: "", genre: "Jazz", dur: 240 },
+  { title: "On Green Dolphin Street", artist: "", genre: "Jazz", dur: 240 },
+  { title: "On The Sunny Side of the Street", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Sandu", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Satin Doll", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Softly, As In A Morning Sunrise", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Someday My Prince Will Come", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Song For My Father", artist: "", genre: "Jazz", dur: 240 },
+  { title: "St. Thomas", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Stella By Starlight", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Straight, No Chaser", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Summertime", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Take Five", artist: "", genre: "Jazz", dur: 324 },
+  { title: "Take The A Train", artist: "", genre: "Jazz", dur: 240 },
+  { title: "The Girl From Ipanema", artist: "", genre: "Jazz", dur: 240 },
+  { title: "There Is No Greater Love", artist: "", genre: "Jazz", dur: 240 },
+  { title: "There Will Never Be Another You", artist: "", genre: "Jazz", dur: 240 },
+  { title: "This I Dig of You", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Watermelon Man", artist: "", genre: "Jazz", dur: 240 },
+  { title: "Wave", artist: "", genre: "Jazz", dur: 240 },
+  { title: "You And The Night And The Music", artist: "", genre: "Jazz", dur: 240 },
+
+  // Chilled
+  { title: "A Thousand Years", artist: "Christina Perri", genre: "Chilled", dur: 285 },
+  { title: "At Last", artist: "Etta James", genre: "Chilled", dur: 182 },
+  { title: "All of Me", artist: "John Legend", genre: "Chilled", dur: 269 },
+  { title: "Back on '74", artist: "Jungle", genre: "Chilled", dur: 211 },
+  { title: "Beautiful Things", artist: "Benson Boone", genre: "Chilled", dur: 218 },
+  { title: "Best Part", artist: "Daniel Caesar, H.E.R", genre: "Chilled", dur: 257 },
+  { title: "Better Together", artist: "Jack Johnson", genre: "Chilled", dur: 207 },
+  { title: "Can't Help Falling In Love", artist: "Elvis Presley", genre: "Chilled", dur: 181 },
+  { title: "Can't Take My Eyes Off You", artist: "Andy Williams", genre: "Chilled", dur: 202 },
+  { title: "Close To You", artist: "The Carpenters", genre: "Chilled", dur: 195 },
+  { title: "Die With A Smile", artist: "Lady Gaga, Bruno Mars", genre: "Chilled", dur: 251 },
+  { title: "Don't Know Why", artist: "Norah Jones", genre: "Chilled", dur: 187 },
+  { title: "If I Ain't Got You", artist: "Alicia Keys", genre: "Chilled", dur: 228 },
+  { title: "I'm Yours", artist: "Jason Mraz", genre: "Chilled", dur: 243 },
+  { title: "Is This Love", artist: "Bob Marley", genre: "Chilled", dur: 234 },
+  { title: "Just The Way You Are", artist: "Bruno Mars", genre: "Chilled", dur: 220 },
+  { title: "Killing Me Softly With His Song", artist: "Fugees, Lauryn Hill", genre: "Chilled", dur: 325 },
+  { title: "Lose Control", artist: "Teddy Swims", genre: "Chilled", dur: 216 },
+  { title: "L-O-V-E", artist: "Nat King Cole", genre: "Chilled", dur: 157 },
+  { title: "Love Really Hurts Without You", artist: "Billy Ocean", genre: "Chilled", dur: 220 },
+  { title: "Marry You", artist: "Bruno Mars", genre: "Chilled", dur: 230 },
+  { title: "Memories", artist: "Maroon 5", genre: "Chilled", dur: 189 },
+  { title: "My Girl", artist: "The Temptations", genre: "Chilled", dur: 165 },
+  { title: "Ordinary", artist: "Alex Warren", genre: "Chilled", dur: 198 },
+  { title: "Perfect", artist: "Ed Sheeran", genre: "Chilled", dur: 263 },
+  { title: "Put Your Records On", artist: "Corinne Bailey Rae", genre: "Chilled", dur: 227 },
+  { title: "Riptide", artist: "Vance Joy", genre: "Chilled", dur: 204 },
+  { title: "Rude", artist: "Magic!", genre: "Chilled", dur: 214 },
+  { title: "So Easy (To Fall In Love)", artist: "Olivia Dean", genre: "Chilled", dur: 198 },
+  { title: "Stand By Me", artist: "Ben E. King", genre: "Chilled", dur: 178 },
+  { title: "Stargazing", artist: "Myles Smith", genre: "Chilled", dur: 197 },
+  { title: "Stick Season", artist: "Noah Kahan", genre: "Chilled", dur: 215 },
+  { title: "Sunday Morning", artist: "Maroon 5", genre: "Chilled", dur: 270 },
+  { title: "Thinking Out Loud", artist: "Ed Sheeran", genre: "Chilled", dur: 281 },
+  { title: "Too Sweet", artist: "Hozier", genre: "Chilled", dur: 219 },
+  { title: "Unwritten", artist: "Natasha Bedingfield", genre: "Chilled", dur: 235 },
+  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Chilled", dur: 229 },
+  { title: "Watermelon Sugar", artist: "Harry Styles", genre: "Chilled", dur: 174 },
+  { title: "Where Is My Husband!", artist: "RAYE", genre: "Chilled", dur: 198 },
+  { title: "Wonderwall", artist: "Oasis", genre: "Chilled", dur: 258 },
+  { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Chilled", dur: 209 },
+
+  // Pop / Upbeat
+  { title: "24K Magic", artist: "Bruno Mars", genre: "Pop / Upbeat", dur: 226 },
+  { title: "Ain't Nobody", artist: "Chaka Khan", genre: "Pop / Upbeat", dur: 258 },
+  { title: "All Night Long", artist: "Lionel Richie", genre: "Pop / Upbeat", dur: 383 },
+  { title: "Baker Street", artist: "Gerry Rafferty", genre: "Pop / Upbeat", dur: 323 },
+  { title: "Billie Jean", artist: "Michael Jackson", genre: "Pop / Upbeat", dur: 294 },
+  { title: "Can't Stop The Feeling", artist: "Justin Timberlake", genre: "Pop / Upbeat", dur: 236 },
+  { title: "Careless Whisper", artist: "George Michael", genre: "Pop / Upbeat", dur: 300 },
+  { title: "Celebration", artist: "Kool & The Gang", genre: "Pop / Upbeat", dur: 245 },
+  { title: "Cheerleader", artist: "OMI, Felix Jaehn", genre: "Pop / Upbeat", dur: 192 },
+  { title: "Crazy In Love", artist: "Beyoncé, JAY-Z", genre: "Pop / Upbeat", dur: 236 },
+  { title: "Dancing In The Moonlight", artist: "Toploader", genre: "Pop / Upbeat", dur: 225 },
+  { title: "Don't Start Now", artist: "Dua Lipa", genre: "Pop / Upbeat", dur: 204 },
+  { title: "Don't Stop Me Now", artist: "Queen", genre: "Pop / Upbeat", dur: 210 },
+  { title: "Don't Stop Til You Get Enough", artist: "Michael Jackson", genre: "Pop / Upbeat", dur: 361 },
+  { title: "Despacito", artist: "Luis Fonsi, Daddy Yankee, Justin Bieber", genre: "Pop / Upbeat", dur: 229 },
+  { title: "Fireball", artist: "Pitbull", genre: "Pop / Upbeat", dur: 191 },
+  { title: "Giant", artist: "Calvin Harris, Rag 'n' Bone Man", genre: "Pop / Upbeat", dur: 215 },
+  { title: "Gimme! Gimme! Gimme!", artist: "Abba", genre: "Pop / Upbeat", dur: 285 },
+  { title: "Hey Ya", artist: "OutKast", genre: "Pop / Upbeat", dur: 234 },
+  { title: "How Will I Know", artist: "Whitney Houston", genre: "Pop / Upbeat", dur: 264 },
+  { title: "I Gotta Feeling", artist: "Black Eyed Peas", genre: "Pop / Upbeat", dur: 289 },
+  { title: "I Wanna Dance With Somebody", artist: "Whitney Houston", genre: "Pop / Upbeat", dur: 291 },
+  { title: "Love Come Down", artist: "Evelyn King", genre: "Pop / Upbeat", dur: 244 },
+  { title: "Love On Top", artist: "Beyoncé", genre: "Pop / Upbeat", dur: 268 },
+  { title: "Low", artist: "Flo Rida", genre: "Pop / Upbeat", dur: 228 },
+  { title: "Mamma Mia", artist: "Abba", genre: "Pop / Upbeat", dur: 214 },
+  { title: "Moving On Up", artist: "M People", genre: "Pop / Upbeat", dur: 241 },
+  { title: "Murder On The Dancefloor", artist: "Sophie Ellis-Bextor", genre: "Pop / Upbeat", dur: 210 },
+  { title: "One Kiss", artist: "Calvin Harris, Dua Lipa", genre: "Pop / Upbeat", dur: 213 },
+  { title: "One Last Time", artist: "Ariana Grande", genre: "Pop / Upbeat", dur: 215 },
+  { title: "Piece of Me", artist: "MK, Becky Hill", genre: "Pop / Upbeat", dur: 220 },
+  { title: "Rather Be", artist: "Clean Bandit, Jess Glynne", genre: "Pop / Upbeat", dur: 248 },
+  { title: "Sex On Fire", artist: "Kings of Leon", genre: "Pop / Upbeat", dur: 213 },
+  { title: "Shape of You", artist: "Ed Sheeran", genre: "Pop / Upbeat", dur: 234 },
+  { title: "Shut Up and Dance", artist: "Walk The Moon", genre: "Pop / Upbeat", dur: 197 },
+  { title: "Somebody Else's Guy", artist: "Jocelyn Brown", genre: "Pop / Upbeat", dur: 240 },
+  { title: "Sweet Caroline", artist: "Neil Diamond", genre: "Pop / Upbeat", dur: 200 },
+  { title: "Teardrops", artist: "Womack & Womack", genre: "Pop / Upbeat", dur: 310 },
+  { title: "Temperature", artist: "Sean Paul", genre: "Pop / Upbeat", dur: 233 },
+  { title: "Timber", artist: "Pitbull / Kesha", genre: "Pop / Upbeat", dur: 205 },
+  { title: "Titanium", artist: "David Guetta / Sia", genre: "Pop / Upbeat", dur: 245 },
+  { title: "Treasure", artist: "Bruno Mars", genre: "Pop / Upbeat", dur: 175 },
+  { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", genre: "Pop / Upbeat", dur: 270 },
+  { title: "We Found Love", artist: "Rihanna, Calvin Harris", genre: "Pop / Upbeat", dur: 216 },
+  { title: "Yeah!", artist: "Usher", genre: "Pop / Upbeat", dur: 250 },
+  { title: "Young Hearts Run Free", artist: "Candi Staton", genre: "Pop / Upbeat", dur: 212 },
+
+  // House & Ibiza
+  { title: "17", artist: "MK", genre: "House & Ibiza", dur: 356 },
+  { title: "Afraid To Feel", artist: "LF System", genre: "House & Ibiza", dur: 193 },
+  { title: "Are You With Me", artist: "Lost Frequencies", genre: "House & Ibiza", dur: 193 },
+  { title: "Changes", artist: "Faul & Wad, PNAU", genre: "House & Ibiza", dur: 213 },
+  { title: "Cold Heart", artist: "Elton John, Dua Lipa, PNAU", genre: "House & Ibiza", dur: 213 },
+  { title: "Dance With Me", artist: "Ehrling", genre: "House & Ibiza", dur: 199 },
+  { title: "Dancing In The Moonlight", artist: "Jubël, NEIMY", genre: "House & Ibiza", dur: 195 },
+  { title: "Destination Calabria", artist: "Alex Gaudino, Crystal Waters", genre: "House & Ibiza", dur: 351 },
+  { title: "Dreamer", artist: "Livin' Joy, Janice Robinson", genre: "House & Ibiza", dur: 240 },
+  { title: "Everybody Dance", artist: "Cedric Gervais, Franklin, Nile Rodgers", genre: "House & Ibiza", dur: 208 },
+  { title: "Feel My Needs", artist: "WEISS, Purple Disco Machine", genre: "House & Ibiza", dur: 226 },
+  { title: "Finally", artist: "CeCe Peniston", genre: "House & Ibiza", dur: 255 },
+  { title: "Finally", artist: "Kings of Tomorrow, Julie McKnight", genre: "House & Ibiza", dur: 390 },
+  { title: "Freed From Desire", artist: "Gala", genre: "House & Ibiza", dur: 225 },
+  { title: "Gypsy Woman", artist: "Crystal Waters", genre: "House & Ibiza", dur: 255 },
+  { title: "Hearts Ain't Gonna Lie", artist: "Arlissa, Jonas Blue, Eden Prince", genre: "House & Ibiza", dur: 210 },
+  { title: "How Deep Is Your Love", artist: "Calvin Harris, Disciples", genre: "House & Ibiza", dur: 193 },
+  { title: "Finder", artist: "Ninetoes", genre: "House & Ibiza", dur: 390 },
+  { title: "I Got U", artist: "Duke Dumont, Jax Jones", genre: "House & Ibiza", dur: 212 },
+  { title: "ily (I love you baby)", artist: "Surf Mesa / Emilee", genre: "House & Ibiza", dur: 185 },
+  { title: "Infinity 2008", artist: "Guru Josh Project, Klaas", genre: "House & Ibiza", dur: 215 },
+  { title: "Intoxicated", artist: "Martin Solveig / GTA", genre: "House & Ibiza", dur: 216 },
+  { title: "I Took a Pill in Ibiza", artist: "Mike Posner, Seeb", genre: "House & Ibiza", dur: 198 },
+  { title: "Jubel", artist: "Klingande", genre: "House & Ibiza", dur: 291 },
+  { title: "Liquid Spirit (Claptone Remix)", artist: "Gregory Porter", genre: "House & Ibiza", dur: 330 },
+  { title: "Look Right Through", artist: "Storm Queen / MK", genre: "House & Ibiza", dur: 338 },
+  { title: "Man With The Red Face", artist: "Mark Knight, Funkagenda", genre: "House & Ibiza", dur: 435 },
+  { title: "Million Dollar Bill", artist: "Whitney Houston, Frankie Knuckles", genre: "House & Ibiza", dur: 390 },
+  { title: "Move Your Body", artist: "Marshall Jefferson, Solardo", genre: "House & Ibiza", dur: 360 },
+  { title: "Mr Saxobeat", artist: "Alexandra Stan", genre: "House & Ibiza", dur: 210 },
+  { title: "My Head Is A Jungle", artist: "Wankelmut, Emma Louise, MK", genre: "House & Ibiza", dur: 239 },
+  { title: "One Day (Vandaag)", artist: "Bakermat", genre: "House & Ibiza", dur: 390 },
+  { title: "Prayer In C", artist: "Lily Wood and The Prick, Robin Schulz", genre: "House & Ibiza", dur: 208 },
+  { title: "Rhythm Is A Dancer", artist: "Snap!", genre: "House & Ibiza", dur: 249 },
+  { title: "The Rhythm of The Night", artist: "Corona", genre: "House & Ibiza", dur: 251 },
+  { title: "Show Me Love", artist: "Robin S", genre: "House & Ibiza", dur: 285 },
+  { title: "Sonnentanz", artist: "Klangkarussell, Will Heard", genre: "House & Ibiza", dur: 300 },
+  { title: "Sugar", artist: "Robin Schulz, Francesco Yates", genre: "House & Ibiza", dur: 196 },
+  { title: "Sunshine", artist: "TIEKS, Dan Harkna", genre: "House & Ibiza", dur: 215 },
+  { title: "This Girl", artist: "Kungs, Cookin' On 3 Burners", genre: "House & Ibiza", dur: 207 },
+  { title: "Wake Me Up", artist: "Avicii", genre: "House & Ibiza", dur: 247 },
+  { title: "Waves", artist: "Mr. Probz, Robin Schulz", genre: "House & Ibiza", dur: 193 },
+  { title: "What Is Love", artist: "Haddaway", genre: "House & Ibiza", dur: 216 },
+
+  // Garage
+  { title: "A Little Bit of Luck", artist: "DJ Luck & MC Neal", genre: "Garage", dur: 201 },
+  { title: "Flowers", artist: "Sweet Female Attitude", genre: "Garage", dur: 242 },
+  { title: "Girls Like Us", artist: "B15 Project / Crissy D / Lady G", genre: "Garage", dur: 221 },
+  { title: "Gotta Get Through This", artist: "Daniel Bedingfield", genre: "Garage", dur: 210 },
+  { title: "Heartbroken", artist: "T2", genre: "Garage", dur: 225 },
+  { title: "Rewind", artist: "Craig David", genre: "Garage", dur: 225 },
+  { title: "Sambuca", artist: "Wideboys, Dennis G", genre: "Garage", dur: 240 },
+  { title: "Sorry! (I Didn't Know)", artist: "Monsta Boy", genre: "Garage", dur: 210 },
+];
+
+const GENRE_ORDER = ["Soul & Motown","Jazz","Chilled","Pop / Upbeat","House & Ibiza","Garage"];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let setlist = [];
+let limitSeconds = 45 * 60;
+let clientName = '';
+let activeGenre = 'All';
+let currentTab = 'repertoire';
+let searchTimer = null;
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function fmtTime(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}:${String(sec).padStart(2, '0')}`;
+}
+function totalSecs() { return setlist.reduce((a, s) => a + (s.dur || 0), 0); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('client');
+  const mins = parseInt(params.get('mins') || '0');
+  if (name && mins > 0) {
+    clientName = decodeURIComponent(name);
+    limitSeconds = mins * 60;
+    document.getElementById('generator-view').style.display = 'none';
+    document.getElementById('client-view').style.display = 'block';
+    document.getElementById('header-client-name').textContent = clientName;
+    document.getElementById('pill-total').textContent = fmtTime(limitSeconds);
+    document.getElementById('bar-limit').textContent = `of ${fmtTime(limitSeconds)} set`;
+    document.title = `Setlist for ${clientName} – Elijah Paul`;
+    renderRepertoire();
+    renderGenreFilters();
+    updateTimebar();
+  }
+}
+
+// ─────────────────────────────────────────────
+// LINK GENERATOR
+// ─────────────────────────────────────────────
+function generateLink() {
+  const name = document.getElementById('gen-name').value.trim();
+  const hours = parseInt(document.getElementById('gen-hours').value);
+  const mins = parseInt(document.getElementById('gen-mins').value);
+  const totalMins = hours * 60 + mins;
+  if (!name) { alert('Please enter a client name.'); return; }
+  if (totalMins < 5) { alert('Please select a set duration.'); return; }
+  const base = window.location.href.split('?')[0];
+  const url = `${base}?client=${encodeURIComponent(name)}&mins=${totalMins}`;
+  document.getElementById('link-url-display').textContent = url;
+  document.getElementById('link-output').classList.add('visible');
+  document.getElementById('copy-btn').textContent = 'Copy Link';
+  document.getElementById('copy-btn').classList.remove('copied');
+}
+
+function copyLink() {
+  const url = document.getElementById('link-url-display').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+  });
+}
+
+// ─────────────────────────────────────────────
+// ADMIN: FETCH DURATIONS FROM ITUNES
+// ─────────────────────────────────────────────
+async function runFetchDurations() {
+  const log = document.getElementById('admin-log');
+  log.innerHTML = '';
+  log.classList.add('visible');
+  addLog('Starting iTunes duration lookup…', '');
+
+  const songsToLookup = REPERTOIRE.filter(s => s.genre !== 'Jazz');
+  let updated = 0, notFound = 0;
+
+  for (const song of songsToLookup) {
+    const q = encodeURIComponent(`${song.title} ${song.artist}`);
+    try {
+      const res = await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=3&media=music`);
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        // Pick the best match: prefer exact title match
+        let best = data.results[0];
+        for (const r of data.results) {
+          if (r.trackName.toLowerCase() === song.title.toLowerCase()) { best = r; break; }
+        }
+        const secs = Math.round((best.trackTimeMillis || 210000) / 1000);
+        const old = song.dur;
+        song.dur = secs;
+        addLog(`✓ ${song.title} — ${fmtTime(old)} → ${fmtTime(secs)}`, 'log-ok');
+        updated++;
+      } else {
+        addLog(`? ${song.title} — not found, keeping ${fmtTime(song.dur)}`, 'log-warn');
+        notFound++;
+      }
+    } catch(e) {
+      addLog(`✗ ${song.title} — error: ${e.message}`, 'log-err');
+      notFound++;
+    }
+    await new Promise(r => setTimeout(r, 120));
+  }
+
+  addLog(``, '');
+  addLog(`Done. ${updated} updated, ${notFound} unchanged. Jazz songs kept at 4:00.`, 'log-ok');
+
+  // Output the updated array as copyable text
+  const code = JSON.stringify(REPERTOIRE, null, 2);
+  const blob = new Blob([code], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  addLog(`<a href="${url}" download="repertoire-updated.json" style="color:#7ec99a">⬇ Download updated repertoire JSON</a>`, '');
+}
+
+function addLog(msg, cls) {
+  const log = document.getElementById('admin-log');
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.innerHTML = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ─────────────────────────────────────────────
+// ADMIN: UPDATE REPERTOIRE FROM WEBSITE
+// ─────────────────────────────────────────────
+async function runUpdateRepertoire() {
+  const log = document.getElementById('admin-log');
+  log.innerHTML = '';
+  log.classList.add('visible');
+  addLog('Fetching elijahpaul.com/repertoire…', '');
+
+  // Use a CORS proxy to scrape the page
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://www.elijahpaul.com/repertoire')}`;
+
+  try {
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const html = data.contents;
+
+    if (!html) { addLog('✗ Could not fetch page.', 'log-err'); return; }
+
+    // Parse the HTML and extract song/artist pairs
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Elijah's site uses a structured list — try multiple selectors
+    const scrapedSongs = [];
+    const KNOWN_GENRES = {
+      'soul': 'Soul & Motown', 'motown': 'Soul & Motown',
+      'jazz': 'Jazz',
+      'chill': 'Chilled', 'chilled': 'Chilled',
+      'pop': 'Pop / Upbeat', 'upbeat': 'Pop / Upbeat',
+      'house': 'House & Ibiza', 'ibiza': 'House & Ibiza',
+      'garage': 'Garage'
+    };
+
+    let currentGenre = 'Pop / Upbeat';
+
+    // Walk all text-bearing elements and extract song data
+    const allEls = doc.querySelectorAll('h1,h2,h3,h4,p,li,td,span,div');
+    for (const el of allEls) {
+      const text = el.textContent.trim();
+      if (!text || text.length < 3 || text.length > 200) continue;
+
+      // Check if this is a genre header
+      const lower = text.toLowerCase();
+      for (const [key, genre] of Object.entries(KNOWN_GENRES)) {
+        if (lower.includes(key)) { currentGenre = genre; break; }
+      }
+
+      // Try to detect song lines: "Song Title – Artist" or "Song Title - Artist"
+      const match = text.match(/^(.+?)\s*[–—-]\s*(.+)$/);
+      if (match) {
+        const title = match[1].trim();
+        const artist = match[2].trim();
+        if (title.length > 1 && title.length < 80 && artist.length > 1) {
+          scrapedSongs.push({ title, artist, genre: currentGenre });
+        }
+      }
+    }
+
+    if (!scrapedSongs.length) {
+      addLog('⚠ Could not detect songs in expected format. The page structure may have changed.', 'log-warn');
+      addLog('Tip: Songs need to be formatted as "Song Title – Artist" in the page HTML.', 'log-warn');
+      return;
+    }
+
+    addLog(`Found ${scrapedSongs.length} songs on website.`, '');
+
+    // Find songs that are new (not already in REPERTOIRE)
+    let addedCount = 0;
+    for (const scraped of scrapedSongs) {
+      const exists = REPERTOIRE.some(r =>
+        r.title.toLowerCase() === scraped.title.toLowerCase()
+      );
+      if (!exists) {
+        // Set Jazz default to 240, others to 210 pending iTunes lookup
+        const defaultDur = scraped.genre === 'Jazz' ? 240 : 210;
+        REPERTOIRE.push({ ...scraped, dur: defaultDur });
+        addLog(`+ New: "${scraped.title}" – ${scraped.artist} [${scraped.genre}]`, 'log-ok');
+        addedCount++;
+      }
+    }
+
+    if (addedCount === 0) {
+      addLog('✓ Repertoire is already up to date — no new songs found.', 'log-ok');
+    } else {
+      addLog(``, '');
+      addLog(`Added ${addedCount} new song(s). Run "Fetch Exact Durations" to get accurate timings.`, 'log-ok');
+    }
+
+  } catch(e) {
+    addLog(`✗ Error: ${e.message}`, 'log-err');
+    addLog('The CORS proxy may be temporarily unavailable. Try again in a moment.', 'log-warn');
+  }
+}
+
+// ─────────────────────────────────────────────
+// REPERTOIRE RENDER
+// ─────────────────────────────────────────────
+function renderGenreFilters() {
+  const wrap = document.getElementById('rep-filters');
+  const all = ['All', ...GENRE_ORDER];
+  wrap.innerHTML = all.map(g =>
+    `<button class="filter-chip ${g === activeGenre ? 'active' : ''}" onclick="setGenre('${g}')">${g}</button>`
+  ).join('');
+}
+
+function setGenre(g) {
+  activeGenre = g;
+  renderGenreFilters();
+  renderRepertoire();
+}
+
+function renderRepertoire() {
+  const q = document.getElementById('rep-search').value.toLowerCase();
+  const list = document.getElementById('rep-list');
+
+  let filtered = REPERTOIRE.filter(s => {
+    const matchesGenre = activeGenre === 'All' || s.genre === activeGenre;
+    const matchesSearch = !q || s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q);
+    return matchesGenre && matchesSearch;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="no-results">No songs match your search.</div>';
+    return;
+  }
+
+  const grouped = {};
+  filtered.forEach(s => {
+    if (!grouped[s.genre]) grouped[s.genre] = [];
+    grouped[s.genre].push(s);
+  });
+
+  let html = '';
+  for (const genre of GENRE_ORDER) {
+    if (!grouped[genre]) continue;
+    if (activeGenre === 'All') html += `<div class="section-header">${genre}</div>`;
+    grouped[genre].forEach(song => {
+      const id = song.title + '|' + song.artist;
+      const inSet = setlist.some(s => s.id === id);
+      const enc = JSON.stringify({...song, id}).replace(/"/g, '&quot;');
+      html += `<div class="song-item ${inSet ? 'in-setlist' : ''}" onclick="toggleSong(${enc})">
+        <div class="song-info">
+          <div class="song-title">${song.title}</div>
+          ${song.artist ? `<div class="song-artist">${song.artist}</div>` : ''}
+        </div>
+        <div class="song-right">
+          <span class="song-duration">${fmtTime(song.dur)}</span>
+          <button class="add-btn ${inSet ? 'added' : ''}">${inSet ? '✓' : '+'}</button>
+        </div>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// EXTERNAL SEARCH (iTunes)
+// ─────────────────────────────────────────────
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(runSearch, 400);
+}
+
+async function runSearch() {
+  const q = document.getElementById('ext-search').value.trim();
+  const info = document.getElementById('search-info');
+  const list = document.getElementById('ext-list');
+  if (q.length < 2) { info.textContent = 'Type to search for any song'; list.innerHTML = ''; return; }
+
+  info.innerHTML = '<span class="spinner"></span>Searching…';
+  list.innerHTML = '';
+  try {
+    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=20&media=music`);
+    const data = await res.json();
+    const results = data.results || [];
+    if (!results.length) { info.textContent = 'No results. Try a different search or use the custom request below.'; return; }
+    info.textContent = `${results.length} results`;
+    list.innerHTML = results.map(r => {
+      const song = { title: r.trackName, artist: r.artistName, genre: 'Custom Request', dur: Math.round((r.trackTimeMillis || 210000) / 1000), id: r.trackName + '|' + r.artistName };
+      const inSet = setlist.some(s => s.id === song.id);
+      const enc = JSON.stringify(song).replace(/"/g, '&quot;');
+      return `<div class="song-item ${inSet ? 'in-setlist' : ''}" onclick="toggleSong(${enc})">
+        <div class="song-info">
+          <div class="song-title">${r.trackName}</div>
+          <div class="song-artist">${r.artistName}</div>
+        </div>
+        <div class="song-right">
+          <span class="song-duration">${fmtTime(Math.round((r.trackTimeMillis||210000)/1000))}</span>
+          <button class="add-btn ${inSet ? 'added' : ''}">${inSet ? '✓' : '+'}</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    info.textContent = 'Search unavailable. Use the custom request below.';
+  }
+}
+
+function addCustomRequest() {
+  const val = document.getElementById('custom-title').value.trim();
+  if (!val) return;
+  const parts = val.split(/[–—-]/).map(s => s.trim());
+  const song = { title: parts[0] || val, artist: parts[1] || 'Custom Request', genre: 'Custom Request', dur: 210, id: val + '|custom', isCustom: true };
+  addToSetlist(song);
+  document.getElementById('custom-title').value = '';
+  showToast(`"${song.title}" added to setlist`);
+}
+
+// ─────────────────────────────────────────────
+// SETLIST
+// ─────────────────────────────────────────────
+function toggleSong(song) {
+  song.id = song.id || (song.title + '|' + song.artist);
+  const idx = setlist.findIndex(s => s.id === song.id);
+  if (idx >= 0) {
+    setlist.splice(idx, 1);
+    updateAll();
+  } else {
+    if (totalSecs() + song.dur > limitSeconds + 300) {
+      showToast(`Can't add — would exceed your ${fmtTime(limitSeconds)} limit`);
+      return;
+    }
+    addToSetlist(song);
+    showToast(`"${song.title}" added`);
+  }
+}
+
+function addToSetlist(song) {
+  song.id = song.id || (song.title + '|' + song.artist);
+  setlist.push(song);
+  updateAll();
+}
+
+function removeFromSetlist(id) {
+  setlist = setlist.filter(s => s.id !== id);
+  updateAll();
+}
+
+function updateAll() {
+  updateTimebar();
+  renderSetlistPanel();
+  if (currentTab === 'repertoire') renderRepertoire();
+  else runSearch();
+}
+
+function updateTimebar() {
+  const used = totalSecs();
+  const pct = Math.min(100, (used / limitSeconds) * 100);
+  document.getElementById('pill-used').textContent = fmtTime(used);
+  document.getElementById('pill-fill').style.width = pct + '%';
+  document.getElementById('pill-fill').className = 'time-pill-fill' + (used > limitSeconds ? ' over' : '');
+  document.getElementById('bar-used').textContent = fmtTime(used) + ' added';
+  const fill = document.getElementById('bar-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'time-bar-fill' + (pct > 90 ? ' warning' : '') + (used > limitSeconds ? ' over' : '');
+  const remEl = document.getElementById('time-remaining');
+  const remaining = limitSeconds - used;
+  if (used > limitSeconds) {
+    remEl.textContent = `${fmtTime(used - limitSeconds)} over limit`;
+    remEl.className = 'time-remaining over';
+  } else {
+    remEl.textContent = `${fmtTime(remaining)} remaining`;
+    remEl.className = 'time-remaining';
+  }
+}
+
+function renderSetlistPanel() {
+  const container = document.getElementById('setlist-items');
+  const count = document.getElementById('setlist-count');
+  const exportBtn = document.getElementById('export-btn');
+  count.textContent = `${setlist.length} song${setlist.length !== 1 ? 's' : ''}`;
+  exportBtn.disabled = setlist.length === 0;
+  if (!setlist.length) {
+    container.innerHTML = `<div class="setlist-empty"><div class="setlist-empty-icon">🎷</div><p>Your setlist is empty.<br>Browse the repertoire or search for songs above.</p></div>`;
+    return;
+  }
+  container.innerHTML = setlist.map((s, i) =>
+    `<div class="setlist-item">
+      <span class="setlist-num">${i + 1}</span>
+      <div class="setlist-item-info">
+        <div class="setlist-item-title">${s.title}</div>
+        <div class="setlist-item-artist">${s.artist || (s.isCustom ? 'Custom request' : '')}</div>
+      </div>
+      <span class="setlist-item-dur">${fmtTime(s.dur)}</span>
+      <button class="remove-btn" onclick="event.stopPropagation(); removeFromSetlist('${s.id.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')" title="Remove">×</button>
+    </div>`
+  ).join('');
+}
+
+function exportSetlist() {
+  const lines = [
+    `Setlist for ${clientName}`,
+    `Set duration: ${fmtTime(limitSeconds)}`,
+    `Total music: ${fmtTime(totalSecs())}`,
+    ``,
+    ...setlist.map((s, i) => `${i + 1}. ${s.title}${s.artist ? ' – ' + s.artist : ''} (${fmtTime(s.dur)})`)
+  ];
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Setlist copied to clipboard!'));
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('pane-repertoire').style.display = tab === 'repertoire' ? 'block' : 'none';
+  document.getElementById('pane-search').style.display = tab === 'search' ? 'block' : 'none';
+  document.getElementById('tab-repertoire').className = 'tab-btn' + (tab === 'repertoire' ? ' active' : '');
+  document.getElementById('tab-search').className = 'tab-btn' + (tab === 'search' ? ' active' : '');
+}
+
+init();
+</script>
+</body>
+</html>
