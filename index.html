@@ -150,6 +150,7 @@
 <div id="generator-view">
   <div class="gen-card">
     <div class="gen-logo">Elijah Paul Music</div>
+    <div id="version-badge" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;letter-spacing:0.08em;"></div>
     <div class="gen-title">Generate a Client Setlist Link</div>
     <p class="gen-sub">Create a personalised link to send to your client — they'll see their name and time limit automatically.</p>
 
@@ -188,26 +189,14 @@
       <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy Link</button>
     </div>
 
-    <hr class="gen-divider">
-
-    <!-- Admin Tools -->
-    <div class="admin-section-label">Admin Tools</div>
-
-    <button class="gen-btn gen-btn-secondary" onclick="runFetchDurations()">
-      🎵 Fetch Exact Durations from iTunes
-    </button>
-    <button class="gen-btn gen-btn-secondary" style="margin-top:10px" onclick="runUpdateRepertoire()">
-      🔄 Update Repertoire from elijahpaul.com
-    </button>
-
-    <div class="admin-log" id="admin-log"></div>
+    <div id="admin-log" class="admin-log"></div>
   </div>
 </div>
 
 <!-- ── CLIENT SETLIST BUILDER ── -->
 <div id="client-view">
   <header>
-    <div class="header-brand">Elijah Paul <span>Saxophonist</span></div>
+    <div style="display:flex;align-items:baseline;gap:10px;"><div class="header-brand">Elijah Paul <span>Saxophonist</span></div><div id="version-badge-client" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;"></div></div>
     <div class="header-meta">
       <div class="header-client">Setlist for <strong id="header-client-name"></strong></div>
       <div class="time-pill">
@@ -379,11 +368,15 @@ let REPERTOIRE = [
   { title: "Don't Know Why", artist: "Norah Jones", genre: "Chilled", dur: 187 },
   { title: "If I Ain't Got You", artist: "Alicia Keys", genre: "Chilled", dur: 228 },
   { title: "I'm Yours", artist: "Jason Mraz", genre: "Chilled", dur: 243 },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Chilled", dur: 375 },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Chilled", dur: 325 },
   { title: "Is This Love", artist: "Bob Marley", genre: "Chilled", dur: 234 },
   { title: "Just The Way You Are", artist: "Bruno Mars", genre: "Chilled", dur: 220 },
   { title: "Killing Me Softly With His Song", artist: "Fugees, Lauryn Hill", genre: "Chilled", dur: 325 },
   { title: "Lose Control", artist: "Teddy Swims", genre: "Chilled", dur: 216 },
   { title: "L-O-V-E", artist: "Nat King Cole", genre: "Chilled", dur: 157 },
+  { title: "Let's Stay Together", artist: "Al Green", genre: "Chilled", dur: 199 },
+  { title: "Lovely Day", artist: "Bill Withers", genre: "Chilled", dur: 261 },
   { title: "Love Really Hurts Without You", artist: "Billy Ocean", genre: "Chilled", dur: 220 },
   { title: "Marry You", artist: "Bruno Mars", genre: "Chilled", dur: 230 },
   { title: "Memories", artist: "Maroon 5", genre: "Chilled", dur: 189 },
@@ -394,7 +387,9 @@ let REPERTOIRE = [
   { title: "Riptide", artist: "Vance Joy", genre: "Chilled", dur: 204 },
   { title: "Rude", artist: "Magic!", genre: "Chilled", dur: 214 },
   { title: "So Easy (To Fall In Love)", artist: "Olivia Dean", genre: "Chilled", dur: 198 },
+  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Chilled", dur: 230 },
   { title: "Stand By Me", artist: "Ben E. King", genre: "Chilled", dur: 178 },
+  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Chilled", dur: 185 },
   { title: "Stargazing", artist: "Myles Smith", genre: "Chilled", dur: 197 },
   { title: "Stick Season", artist: "Noah Kahan", genre: "Chilled", dur: 215 },
   { title: "Sunday Morning", artist: "Maroon 5", genre: "Chilled", dur: 270 },
@@ -403,6 +398,7 @@ let REPERTOIRE = [
   { title: "Unwritten", artist: "Natasha Bedingfield", genre: "Chilled", dur: 235 },
   { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Chilled", dur: 229 },
   { title: "Watermelon Sugar", artist: "Harry Styles", genre: "Chilled", dur: 174 },
+  { title: "What A Wonderful World", artist: "Louis Armstrong", genre: "Chilled", dur: 138 },
   { title: "Where Is My Husband!", artist: "RAYE", genre: "Chilled", dur: 198 },
   { title: "Wonderwall", artist: "Oasis", genre: "Chilled", dur: 258 },
   { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Chilled", dur: 209 },
@@ -454,6 +450,7 @@ let REPERTOIRE = [
   { title: "We Found Love", artist: "Rihanna, Calvin Harris", genre: "Pop / Upbeat", dur: 216 },
   { title: "Yeah!", artist: "Usher", genre: "Pop / Upbeat", dur: 250 },
   { title: "Young Hearts Run Free", artist: "Candi Staton", genre: "Pop / Upbeat", dur: 212 },
+  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Pop / Upbeat", dur: 229 },
 
   // House & Ibiza
   { title: "17", artist: "MK", genre: "House & Ibiza", dur: 356 },
@@ -477,11 +474,12 @@ let REPERTOIRE = [
   { title: "I Got U", artist: "Duke Dumont, Jax Jones", genre: "House & Ibiza", dur: 212 },
   { title: "ily (I love you baby)", artist: "Surf Mesa / Emilee", genre: "House & Ibiza", dur: 185 },
   { title: "Infinity 2008", artist: "Guru Josh Project, Klaas", genre: "House & Ibiza", dur: 215 },
-  { title: "Intoxicated", artist: "Martin Solveig / GTA", genre: "House & Ibiza", dur: 216 },
+  { title: "Intoxicated", artist: "Martin Solveig / Good Times Ahead", genre: "House & Ibiza", dur: 216 },
   { title: "I Took a Pill in Ibiza", artist: "Mike Posner, Seeb", genre: "House & Ibiza", dur: 198 },
+  { title: "Is This Love Remix", artist: "Bob Marley, LVNDSCAPE, Bolier", genre: "House & Ibiza", dur: 210 },
   { title: "Jubel", artist: "Klingande", genre: "House & Ibiza", dur: 291 },
   { title: "Liquid Spirit (Claptone Remix)", artist: "Gregory Porter", genre: "House & Ibiza", dur: 330 },
-  { title: "Look Right Through", artist: "Storm Queen / MK", genre: "House & Ibiza", dur: 338 },
+  { title: "Look Right Through (MK Vocal Edit)", artist: "Storm Queen / MK", genre: "House & Ibiza", dur: 338 },
   { title: "Man With The Red Face", artist: "Mark Knight, Funkagenda", genre: "House & Ibiza", dur: 435 },
   { title: "Million Dollar Bill", artist: "Whitney Houston, Frankie Knuckles", genre: "House & Ibiza", dur: 390 },
   { title: "Move Your Body", artist: "Marshall Jefferson, Solardo", genre: "House & Ibiza", dur: 360 },
@@ -492,7 +490,7 @@ let REPERTOIRE = [
   { title: "Rhythm Is A Dancer", artist: "Snap!", genre: "House & Ibiza", dur: 249 },
   { title: "The Rhythm of The Night", artist: "Corona", genre: "House & Ibiza", dur: 251 },
   { title: "Show Me Love", artist: "Robin S", genre: "House & Ibiza", dur: 285 },
-  { title: "Sonnentanz", artist: "Klangkarussell, Will Heard", genre: "House & Ibiza", dur: 300 },
+  { title: "Sonnentanz Sun Don't Shine", artist: "Klangkarussell, Will Heard", genre: "House & Ibiza", dur: 300 },
   { title: "Sugar", artist: "Robin Schulz, Francesco Yates", genre: "House & Ibiza", dur: 196 },
   { title: "Sunshine", artist: "TIEKS, Dan Harkna", genre: "House & Ibiza", dur: 215 },
   { title: "This Girl", artist: "Kungs, Cookin' On 3 Burners", genre: "House & Ibiza", dur: 207 },
@@ -541,6 +539,24 @@ function showToast(msg) {
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
+// VERSION - reads Last-Modified header from GitHub Pages to show deploy time
+// ─────────────────────────────────────────────
+(async function showVersion() {
+  try {
+    const r = await fetch(window.location.pathname + '?_v=' + Date.now(), { method: 'HEAD' });
+    const lastMod = r.headers.get('last-modified');
+    if (lastMod) {
+      const d = new Date(lastMod);
+      const pad = n => String(n).padStart(2,'0');
+      const label = 'v' + d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      ['version-badge','version-badge-client'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = label;
+      });
+    }
+  } catch(e) {}
+})();
+
 function init() {
   const params = new URLSearchParams(window.location.search);
   const name = params.get('client');
