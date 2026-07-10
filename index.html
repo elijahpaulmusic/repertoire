@@ -196,7 +196,7 @@
 <!-- ── CLIENT SETLIST BUILDER ── -->
 <div id="client-view">
   <header>
-    <div style="display:flex;align-items:baseline;gap:10px;"><div class="header-brand">Elijah Paul <span>Saxophonist</span></div><div id="version-badge-client" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;"></div></div>
+    <div class="header-brand">Elijah Paul <span>Saxophonist</span></div>
     <div class="header-meta">
       <div class="header-client">Setlist for <strong id="header-client-name"></strong></div>
       <div class="time-pill">
@@ -275,18 +275,20 @@ let REPERTOIRE = [
   // Soul & Motown
   { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", genre: "Soul & Motown", dur: 251 },
   { title: "The Best", artist: "Diana Ross", genre: "Soul & Motown", dur: 229 },
+  { title: "Best of My Love", artist: "The Emotions", genre: "Soul & Motown", dur: 222 },
   { title: "Dancin' In The Street", artist: "Martha and The Vandellas", genre: "Soul & Motown", dur: 148 },
   { title: "Don't You Worry 'Bout A Thing", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 252 },
   { title: "Get Ready", artist: "The Temptations", genre: "Soul & Motown", dur: 160 },
   { title: "Give Me The Night", artist: "George Benson", genre: "Soul & Motown", dur: 248 },
   { title: "Happy Birthday", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 391 },
   { title: "I Heard It Through The Grapevine", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 230 },
+  { title: "I Can't Help Myself (Sugar Pie, Honey Bunch)", artist: "Four Tops", genre: "Soul & Motown", dur: 170 },
   { title: "I'm Coming Out", artist: "Diana Ross", genre: "Soul & Motown", dur: 212 },
-  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 375 },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 375, linkedTitle: "Isn't She Lovely" },
   { title: "I Wish", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 246 },
-  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Soul & Motown", dur: 325 },
-  { title: "Let's Stay Together", artist: "Al Green", genre: "Soul & Motown", dur: 199 },
-  { title: "Lovely Day", artist: "Bill Withers", genre: "Soul & Motown", dur: 261 },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Soul & Motown", dur: 325, linkedTitle: "Just The Two of Us" },
+  { title: "Let's Stay Together", artist: "Al Green", genre: "Soul & Motown", dur: 199, linkedTitle: "Let's Stay Together" },
+  { title: "Lovely Day", artist: "Bill Withers", genre: "Soul & Motown", dur: 261, linkedTitle: "Lovely Day" },
   { title: "Master Blaster (Jammin')", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 340 },
   { title: "Move On Up", artist: "Curtis Mayfield", genre: "Soul & Motown", dur: 441 },
   { title: "Never Too Much", artist: "Luther Vandross", genre: "Soul & Motown", dur: 210 },
@@ -295,13 +297,14 @@ let REPERTOIRE = [
   { title: "Rock With You", artist: "Michael Jackson", genre: "Soul & Motown", dur: 219 },
   { title: "September", artist: "Earth, Wind & Fire", genre: "Soul & Motown", dur: 215 },
   { title: "Signed, Sealed, Delivered", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 162 },
-  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 230 },
+  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 230, linkedTitle: "Sir Duke" },
   { title: "Smooth Operator", artist: "Sade", genre: "Soul & Motown", dur: 283 },
   { title: "Stop! In The Name of Love", artist: "The Supremes", genre: "Soul & Motown", dur: 171 },
+  { title: "Sunny", artist: "Bobby Hebb", genre: "Soul & Motown", dur: 175 },
   { title: "Sweet Love", artist: "Anita Baker", genre: "Soul & Motown", dur: 270 },
   { title: "Thinking of You", artist: "Sister Sledge", genre: "Soul & Motown", dur: 237 },
-  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Soul & Motown", dur: 185 },
-  { title: "What a Wonderful World", artist: "Louis Armstrong", genre: "Soul & Motown", dur: 138 },
+  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Soul & Motown", dur: 185, linkedTitle: "This Will Be" },
+  { title: "What a Wonderful World", artist: "Louis Armstrong", genre: "Soul & Motown", dur: 138, linkedTitle: "What a Wonderful World" },
   { title: "What's Going On", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 235 },
   { title: "You Can't Hurry Love", artist: "The Supremes", genre: "Soul & Motown", dur: 165 },
 
@@ -368,15 +371,15 @@ let REPERTOIRE = [
   { title: "Don't Know Why", artist: "Norah Jones", genre: "Chilled", dur: 187 },
   { title: "If I Ain't Got You", artist: "Alicia Keys", genre: "Chilled", dur: 228 },
   { title: "I'm Yours", artist: "Jason Mraz", genre: "Chilled", dur: 243 },
-  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Chilled", dur: 375 },
-  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Chilled", dur: 325 },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Chilled", dur: 375, linkedTitle: "Isn't She Lovely" },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Chilled", dur: 325, linkedTitle: "Just The Two of Us" },
   { title: "Is This Love", artist: "Bob Marley", genre: "Chilled", dur: 234 },
   { title: "Just The Way You Are", artist: "Bruno Mars", genre: "Chilled", dur: 220 },
   { title: "Killing Me Softly With His Song", artist: "Fugees, Lauryn Hill", genre: "Chilled", dur: 325 },
   { title: "Lose Control", artist: "Teddy Swims", genre: "Chilled", dur: 216 },
   { title: "L-O-V-E", artist: "Nat King Cole", genre: "Chilled", dur: 157 },
-  { title: "Let's Stay Together", artist: "Al Green", genre: "Chilled", dur: 199 },
-  { title: "Lovely Day", artist: "Bill Withers", genre: "Chilled", dur: 261 },
+  { title: "Let's Stay Together", artist: "Al Green", genre: "Chilled", dur: 199, linkedTitle: "Let's Stay Together" },
+  { title: "Lovely Day", artist: "Bill Withers", genre: "Chilled", dur: 261, linkedTitle: "Lovely Day" },
   { title: "Love Really Hurts Without You", artist: "Billy Ocean", genre: "Chilled", dur: 220 },
   { title: "Marry You", artist: "Bruno Mars", genre: "Chilled", dur: 230 },
   { title: "Memories", artist: "Maroon 5", genre: "Chilled", dur: 189 },
@@ -387,18 +390,18 @@ let REPERTOIRE = [
   { title: "Riptide", artist: "Vance Joy", genre: "Chilled", dur: 204 },
   { title: "Rude", artist: "Magic!", genre: "Chilled", dur: 214 },
   { title: "So Easy (To Fall In Love)", artist: "Olivia Dean", genre: "Chilled", dur: 198 },
-  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Chilled", dur: 230 },
+  { title: "Sir Duke", artist: "Stevie Wonder", genre: "Chilled", dur: 230, linkedTitle: "Sir Duke" },
   { title: "Stand By Me", artist: "Ben E. King", genre: "Chilled", dur: 178 },
-  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Chilled", dur: 185 },
+  { title: "This Will Be (An Everlasting Love)", artist: "Natalie Cole", genre: "Chilled", dur: 185, linkedTitle: "This Will Be" },
   { title: "Stargazing", artist: "Myles Smith", genre: "Chilled", dur: 197 },
   { title: "Stick Season", artist: "Noah Kahan", genre: "Chilled", dur: 215 },
   { title: "Sunday Morning", artist: "Maroon 5", genre: "Chilled", dur: 270 },
   { title: "Thinking Out Loud", artist: "Ed Sheeran", genre: "Chilled", dur: 281 },
   { title: "Too Sweet", artist: "Hozier", genre: "Chilled", dur: 219 },
   { title: "Unwritten", artist: "Natasha Bedingfield", genre: "Chilled", dur: 235 },
-  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Chilled", dur: 229 },
+  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Chilled", dur: 229, linkedTitle: "Valerie" },
   { title: "Watermelon Sugar", artist: "Harry Styles", genre: "Chilled", dur: 174 },
-  { title: "What A Wonderful World", artist: "Louis Armstrong", genre: "Chilled", dur: 138 },
+  { title: "What A Wonderful World", artist: "Louis Armstrong", genre: "Chilled", dur: 138, linkedTitle: "What a Wonderful World" },
   { title: "Where Is My Husband!", artist: "RAYE", genre: "Chilled", dur: 198 },
   { title: "Wonderwall", artist: "Oasis", genre: "Chilled", dur: 258 },
   { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Chilled", dur: 209 },
@@ -414,7 +417,7 @@ let REPERTOIRE = [
   { title: "Celebration", artist: "Kool & The Gang", genre: "Pop / Upbeat", dur: 245 },
   { title: "Cheerleader", artist: "OMI, Felix Jaehn", genre: "Pop / Upbeat", dur: 192 },
   { title: "Crazy In Love", artist: "Beyoncé, JAY-Z", genre: "Pop / Upbeat", dur: 236 },
-  { title: "Dancing In The Moonlight", artist: "Toploader", genre: "Pop / Upbeat", dur: 225 },
+  { title: "Dancing In The Moonlight", artist: "Toploader", genre: "Pop / Upbeat", dur: 225, linkedTitle: "Dancing In The Moonlight" },
   { title: "Don't Start Now", artist: "Dua Lipa", genre: "Pop / Upbeat", dur: 204 },
   { title: "Don't Stop Me Now", artist: "Queen", genre: "Pop / Upbeat", dur: 210 },
   { title: "Don't Stop Til You Get Enough", artist: "Michael Jackson", genre: "Pop / Upbeat", dur: 361 },
@@ -450,7 +453,7 @@ let REPERTOIRE = [
   { title: "We Found Love", artist: "Rihanna, Calvin Harris", genre: "Pop / Upbeat", dur: 216 },
   { title: "Yeah!", artist: "Usher", genre: "Pop / Upbeat", dur: 250 },
   { title: "Young Hearts Run Free", artist: "Candi Staton", genre: "Pop / Upbeat", dur: 212 },
-  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Pop / Upbeat", dur: 229 },
+  { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Pop / Upbeat", dur: 229, linkedTitle: "Valerie" },
 
   // House & Ibiza
   { title: "17", artist: "MK", genre: "House & Ibiza", dur: 356 },
@@ -459,7 +462,7 @@ let REPERTOIRE = [
   { title: "Changes", artist: "Faul & Wad, PNAU", genre: "House & Ibiza", dur: 213 },
   { title: "Cold Heart", artist: "Elton John, Dua Lipa, PNAU", genre: "House & Ibiza", dur: 213 },
   { title: "Dance With Me", artist: "Ehrling", genre: "House & Ibiza", dur: 199 },
-  { title: "Dancing In The Moonlight", artist: "Jubël, NEIMY", genre: "House & Ibiza", dur: 195 },
+  { title: "Dancing In The Moonlight", artist: "Jubël, NEIMY", genre: "House & Ibiza", dur: 195, linkedTitle: "Dancing In The Moonlight" },
   { title: "Destination Calabria", artist: "Alex Gaudino, Crystal Waters", genre: "House & Ibiza", dur: 351 },
   { title: "Dreamer", artist: "Livin' Joy, Janice Robinson", genre: "House & Ibiza", dur: 240 },
   { title: "Everybody Dance", artist: "Cedric Gervais, Franklin, Nile Rodgers", genre: "House & Ibiza", dur: 208 },
@@ -549,7 +552,7 @@ function showToast(msg) {
       const d = new Date(lastMod);
       const pad = n => String(n).padStart(2,'0');
       const label = 'v' + d.getFullYear() + '.' + pad(d.getMonth()+1) + '.' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-      ['version-badge','version-badge-client'].forEach(function(id) {
+      ['version-badge'].forEach(function(id) {
         const el = document.getElementById(id);
         if (el) el.textContent = label;
       });
@@ -845,7 +848,8 @@ function renderRepertoire() {
     if (activeGenre === 'All') html += `<div class="section-header">${genre}</div>`;
     grouped[genre].forEach(song => {
       const id = song.title + '|' + song.artist;
-      const inSet = setlist.some(s => s.id === id);
+      const inSet = setlist.some(s => s.id === id) ||
+        (song.linkedTitle && setlist.some(s => s.linkedTitle === song.linkedTitle));
       const enc = JSON.stringify({...song, id}).replace(/"/g, '&quot;');
       html += `<div class="song-item ${inSet ? 'in-setlist' : ''}" onclick="toggleSong(${enc})">
         <div class="song-info">
@@ -919,6 +923,17 @@ function addCustomRequest() {
 // ─────────────────────────────────────────────
 function toggleSong(song) {
   song.id = song.id || (song.title + '|' + song.artist);
+
+  // If this song has a linkedTitle, check if the linked version is already in the setlist
+  if (song.linkedTitle) {
+    const linkedIdx = setlist.findIndex(s => s.linkedTitle === song.linkedTitle);
+    if (linkedIdx >= 0 && setlist[linkedIdx].id !== song.id) {
+      // The other category's version is already added — block
+      showToast('Already added');
+      return;
+    }
+  }
+
   const idx = setlist.findIndex(s => s.id === song.id);
   if (idx >= 0) {
     setlist.splice(idx, 1);
