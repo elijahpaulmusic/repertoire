@@ -654,21 +654,58 @@ async function runUpdateRepertoire() {
   log.classList.add('visible');
   addLog('Fetching elijahpaul.com/repertoire…', '');
 
-  // Use a CORS proxy to scrape the page
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://www.elijahpaul.com/repertoire')}`;
+  // Multiple CORS proxies tried in order - if one is down, the next is used
+  const TARGET = 'https://www.elijahpaul.com/repertoire';
+  const PROXIES = [
+    { name: 'allorigins.win', url: u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}` },
+    { name: 'corsproxy.io',   url: u => `https://corsproxy.io/?${encodeURIComponent(u)}` },
+    { name: 'codetabs.com',   url: u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` },
+  ];
+
+  // Force a browser repaint between log lines so they appear in real time
+  const flush = () => new Promise(r => setTimeout(r, 30));
+
+  // Attempt each proxy until one succeeds
+  async function fetchViaProxy(targetUrl) {
+    for (let i = 0; i < PROXIES.length; i++) {
+      const proxy = PROXIES[i];
+      addLog(`[${i+1}/${PROXIES.length}] Trying ${proxy.name}...`, '');
+      await flush();
+      try {
+        const res = await fetch(proxy.url(targetUrl), { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) {
+          addLog(`[${i+1}/${PROXIES.length}] ${proxy.name} - HTTP ${res.status} error${i < PROXIES.length-1 ? ', trying next...' : ''}`, 'log-err');
+          await flush();
+          continue;
+        }
+        const data = await res.json();
+        const html = data.contents || data;
+        if (typeof html === 'string' && html.length > 500) {
+          addLog(`[${i+1}/${PROXIES.length}] ${proxy.name} - success!`, 'log-ok');
+          await flush();
+          return html;
+        }
+        addLog(`[${i+1}/${PROXIES.length}] ${proxy.name} - empty response${i < PROXIES.length-1 ? ', trying next...' : ''}`, 'log-err');
+        await flush();
+      } catch(e) {
+        addLog(`[${i+1}/${PROXIES.length}] ${proxy.name} - FAILED (${e.message})${i < PROXIES.length-1 ? ', trying next...' : ''}`, 'log-err');
+        await flush();
+      }
+    }
+    return null;
+  }
 
   try {
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
-    const html = data.contents;
-
-    if (!html) { addLog('✗ Could not fetch page.', 'log-err'); return; }
+    const html = await fetchViaProxy(TARGET);
+    if (!html) {
+      addLog('✗ All proxies failed. This is a temporary network issue — please try again in a few minutes.', 'log-err');
+      return;
+    }
 
     // Parse the HTML and extract song/artist pairs
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    // Elijah's site uses a structured list — try multiple selectors
     const scrapedSongs = [];
     const KNOWN_GENRES = {
       'soul': 'Soul & Motown', 'motown': 'Soul & Motown',
@@ -681,19 +718,16 @@ async function runUpdateRepertoire() {
 
     let currentGenre = 'Pop / Upbeat';
 
-    // Walk all text-bearing elements and extract song data
     const allEls = doc.querySelectorAll('h1,h2,h3,h4,p,li,td,span,div');
     for (const el of allEls) {
       const text = el.textContent.trim();
       if (!text || text.length < 3 || text.length > 200) continue;
 
-      // Check if this is a genre header
       const lower = text.toLowerCase();
       for (const [key, genre] of Object.entries(KNOWN_GENRES)) {
         if (lower.includes(key)) { currentGenre = genre; break; }
       }
 
-      // Try to detect song lines: "Song Title – Artist" or "Song Title - Artist"
       const match = text.match(/^(.+?)\s*[–—-]\s*(.+)$/);
       if (match) {
         const title = match[1].trim();
@@ -711,32 +745,43 @@ async function runUpdateRepertoire() {
     }
 
     addLog(`Found ${scrapedSongs.length} songs on website.`, '');
+    addLog('', '');
 
-    // Find songs that are new (not already in REPERTOIRE)
+    // ── ADD new songs ──
     let addedCount = 0;
     for (const scraped of scrapedSongs) {
-      const exists = REPERTOIRE.some(r =>
-        r.title.toLowerCase() === scraped.title.toLowerCase()
-      );
+      const exists = REPERTOIRE.some(r => r.title.toLowerCase() === scraped.title.toLowerCase());
       if (!exists) {
-        // Set Jazz default to 240, others to 210 pending iTunes lookup
         const defaultDur = scraped.genre === 'Jazz' ? 240 : 210;
         REPERTOIRE.push({ ...scraped, dur: defaultDur });
-        addLog(`+ New: "${scraped.title}" – ${scraped.artist} [${scraped.genre}]`, 'log-ok');
+        addLog(`+ Added: "${scraped.title}" – ${scraped.artist} [${scraped.genre}]`, 'log-ok');
         addedCount++;
       }
     }
 
-    if (addedCount === 0) {
-      addLog('✓ Repertoire is already up to date — no new songs found.', 'log-ok');
+    // ── REMOVE songs no longer on the website (Jazz standards excluded — they rarely change) ──
+    let removedCount = 0;
+    const scrapedTitles = scrapedSongs.map(s => s.title.toLowerCase());
+    const toRemove = REPERTOIRE.filter(r =>
+      r.genre !== 'Jazz' && !scrapedTitles.includes(r.title.toLowerCase())
+    );
+    for (const song of toRemove) {
+      REPERTOIRE = REPERTOIRE.filter(r => r.title.toLowerCase() !== song.title.toLowerCase());
+      addLog(`− Removed: "${song.title}" (no longer on website)`, 'log-warn');
+      removedCount++;
+    }
+
+    addLog('', '');
+    if (addedCount === 0 && removedCount === 0) {
+      addLog('✓ Repertoire is already up to date — no changes needed.', 'log-ok');
     } else {
-      addLog(``, '');
-      addLog(`Added ${addedCount} new song(s). Run "Fetch Exact Durations" to get accurate timings.`, 'log-ok');
+      if (addedCount > 0) addLog(`✓ ${addedCount} song(s) added.`, 'log-ok');
+      if (removedCount > 0) addLog(`✓ ${removedCount} song(s) removed.`, 'log-ok');
+      addLog('Run "Fetch Exact Durations" to get accurate timings for any new songs.', 'log-ok');
     }
 
   } catch(e) {
-    addLog(`✗ Error: ${e.message}`, 'log-err');
-    addLog('The CORS proxy may be temporarily unavailable. Try again in a moment.', 'log-warn');
+    addLog(`✗ Unexpected error: ${e.message}`, 'log-err');
   }
 }
 
