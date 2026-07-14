@@ -132,6 +132,9 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--white); padding: 10px 20px; border-radius: 100px; font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .no-results { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .client-blurb { padding: 20px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .client-blurb p { font-family: 'Open Sans Condensed', sans-serif; font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 10px; }
+  .client-blurb p:last-child { margin-bottom: 0; }
   .section-label { font-family: 'Open Sans Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .sample-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 6px; margin-top: 4px; }
   .sample-name { font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
@@ -214,6 +217,11 @@
   </header>
   <div class="app-layout">
     <div class="browser">
+      <div class="client-blurb">
+        <p>Please choose any songs you like by searching for them. If you're short for ideas, you can start with one of my many sample set lists, add the set and then add to it with any favourites! You're welcome to browse through my repertoire tab and choose from over 200 songs I play regularly!</p>
+        <p>Once you're happy with your setlist, simply press the Copy to Clipboard button and paste it in an email. I'll be happy to perform anything you choose!</p>
+        <p>Please note that the order of the songs will be subject to change, I aim to create a playlist that flows seamlessly from one song to the next so simply choose the songs and I'll do the rest!</p>
+      </div>
       <div class="tabs">
         <button class="tab-btn active" id="tab-repertoire" onclick="switchTab('repertoire')">My Repertoire</button>
         <button class="tab-btn" id="tab-search" onclick="switchTab('search')">Search Any Song</button>
