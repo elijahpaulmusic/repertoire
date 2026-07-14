@@ -132,6 +132,11 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--white); padding: 10px 20px; border-radius: 100px; font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .no-results { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .section-label { font-family: 'Open Sans Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .sample-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 6px; margin-top: 4px; }
+  .sample-name { font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .add-all-btn { padding: 5px 14px; background: var(--gold); color: var(--white); border: none; border-radius: 100px; font-family: 'Open Sans Condensed', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s; white-space: nowrap; }
+  .add-all-btn:hover { background: var(--gold-light); }
   @media (max-width: 768px) {
     .app-layout { grid-template-columns: 1fr; }
     .setlist-panel { position: fixed; bottom: 0; left: 0; right: 0; height: auto; max-height: 50vh; top: auto; border-top: 2px solid var(--border); z-index: 90; }
@@ -216,9 +221,12 @@
       <div id="pane-repertoire">
         <div class="search-wrap">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="search-input" id="rep-search" placeholder="Search repertoire…" oninput="renderRepertoire()" />
+          <input class="search-input" id="rep-search" placeholder="Search repertoire…" oninput="activeSample=null; renderSampleFilters(); renderRepertoire()" />
         </div>
+        <div class="section-label">Genres:</div>
         <div class="filters" id="rep-filters"></div>
+        <div class="section-label" style="margin-top:16px">Sample Setlists:</div>
+        <div class="filters" id="sample-filters"></div>
         <div class="song-list" id="rep-list"></div>
       </div>
       <div id="pane-search" style="display:none">
@@ -273,24 +281,24 @@
 // ─────────────────────────────────────────────
 let REPERTOIRE = [
   // Soul & Motown
-  { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", genre: "Soul & Motown", dur: 251 },
+  { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", genre: "Soul & Motown", dur: 151 },
   { title: "The Best", artist: "Diana Ross", genre: "Soul & Motown", dur: 229 },
   { title: "Best of My Love", artist: "The Emotions", genre: "Soul & Motown", dur: 222 },
   { title: "Dancin' In The Street", artist: "Martha and The Vandellas", genre: "Soul & Motown", dur: 148 },
   { title: "Don't You Worry 'Bout A Thing", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 252 },
   { title: "Get Ready", artist: "The Temptations", genre: "Soul & Motown", dur: 160 },
   { title: "Give Me The Night", artist: "George Benson", genre: "Soul & Motown", dur: 248 },
-  { title: "Happy Birthday", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 391 },
+  { title: "Happy Birthday", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 354 },
   { title: "I Heard It Through The Grapevine", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 230 },
   { title: "I Can't Help Myself (Sugar Pie, Honey Bunch)", artist: "Four Tops", genre: "Soul & Motown", dur: 170 },
   { title: "I'm Coming Out", artist: "Diana Ross", genre: "Soul & Motown", dur: 212 },
-  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 375, linkedTitle: "Isn't She Lovely" },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 198, linkedTitle: "Isn't She Lovely" },
   { title: "I Wish", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 246 },
-  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Soul & Motown", dur: 325, linkedTitle: "Just The Two of Us" },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Soul & Motown", dur: 236, linkedTitle: "Just The Two of Us" },
   { title: "Let's Stay Together", artist: "Al Green", genre: "Soul & Motown", dur: 199, linkedTitle: "Let's Stay Together" },
   { title: "Lovely Day", artist: "Bill Withers", genre: "Soul & Motown", dur: 261, linkedTitle: "Lovely Day" },
   { title: "Master Blaster (Jammin')", artist: "Stevie Wonder", genre: "Soul & Motown", dur: 340 },
-  { title: "Move On Up", artist: "Curtis Mayfield", genre: "Soul & Motown", dur: 441 },
+  { title: "Move On Up", artist: "Curtis Mayfield", genre: "Soul & Motown", dur: 165 },
   { title: "Never Too Much", artist: "Luther Vandross", genre: "Soul & Motown", dur: 210 },
   { title: "Play That Funky Music", artist: "Wild Cherry", genre: "Soul & Motown", dur: 344 },
   { title: "Reach Out (I'll Be There)", artist: "Four Tops", genre: "Soul & Motown", dur: 175 },
@@ -371,8 +379,8 @@ let REPERTOIRE = [
   { title: "Don't Know Why", artist: "Norah Jones", genre: "Chilled", dur: 187 },
   { title: "If I Ain't Got You", artist: "Alicia Keys", genre: "Chilled", dur: 228 },
   { title: "I'm Yours", artist: "Jason Mraz", genre: "Chilled", dur: 243 },
-  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Chilled", dur: 375, linkedTitle: "Isn't She Lovely" },
-  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Chilled", dur: 325, linkedTitle: "Just The Two of Us" },
+  { title: "Isn't She Lovely", artist: "Stevie Wonder", genre: "Chilled", dur: 198, linkedTitle: "Isn't She Lovely" },
+  { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", genre: "Chilled", dur: 236, linkedTitle: "Just The Two of Us" },
   { title: "Is This Love", artist: "Bob Marley", genre: "Chilled", dur: 234 },
   { title: "Just The Way You Are", artist: "Bruno Mars", genre: "Chilled", dur: 220 },
   { title: "Killing Me Softly With His Song", artist: "Fugees, Lauryn Hill", genre: "Chilled", dur: 325 },
@@ -409,8 +417,8 @@ let REPERTOIRE = [
   // Pop / Upbeat
   { title: "24K Magic", artist: "Bruno Mars", genre: "Pop / Upbeat", dur: 226 },
   { title: "Ain't Nobody", artist: "Chaka Khan", genre: "Pop / Upbeat", dur: 258 },
-  { title: "All Night Long", artist: "Lionel Richie", genre: "Pop / Upbeat", dur: 383 },
-  { title: "Baker Street", artist: "Gerry Rafferty", genre: "Pop / Upbeat", dur: 323 },
+  { title: "All Night Long", artist: "Lionel Richie", genre: "Pop / Upbeat", dur: 257 },
+  { title: "Baker Street", artist: "Gerry Rafferty", genre: "Pop / Upbeat", dur: 246 },
   { title: "Billie Jean", artist: "Michael Jackson", genre: "Pop / Upbeat", dur: 294 },
   { title: "Can't Stop The Feeling", artist: "Justin Timberlake", genre: "Pop / Upbeat", dur: 236 },
   { title: "Careless Whisper", artist: "George Michael", genre: "Pop / Upbeat", dur: 300 },
@@ -480,15 +488,15 @@ let REPERTOIRE = [
   { title: "Intoxicated", artist: "Martin Solveig / Good Times Ahead", genre: "House & Ibiza", dur: 216 },
   { title: "I Took a Pill in Ibiza", artist: "Mike Posner, Seeb", genre: "House & Ibiza", dur: 198 },
   { title: "Is This Love Remix", artist: "Bob Marley, LVNDSCAPE, Bolier", genre: "House & Ibiza", dur: 210 },
-  { title: "Jubel", artist: "Klingande", genre: "House & Ibiza", dur: 291 },
+  { title: "Jubel", artist: "Klingande", genre: "House & Ibiza", dur: 148 },
   { title: "Liquid Spirit (Claptone Remix)", artist: "Gregory Porter", genre: "House & Ibiza", dur: 330 },
   { title: "Look Right Through (MK Vocal Edit)", artist: "Storm Queen / MK", genre: "House & Ibiza", dur: 338 },
-  { title: "Man With The Red Face", artist: "Mark Knight, Funkagenda", genre: "House & Ibiza", dur: 435 },
+  { title: "Man With The Red Face", artist: "Mark Knight, Funkagenda", genre: "House & Ibiza", dur: 234 },
   { title: "Million Dollar Bill", artist: "Whitney Houston, Frankie Knuckles", genre: "House & Ibiza", dur: 390 },
   { title: "Move Your Body", artist: "Marshall Jefferson, Solardo", genre: "House & Ibiza", dur: 360 },
   { title: "Mr Saxobeat", artist: "Alexandra Stan", genre: "House & Ibiza", dur: 210 },
   { title: "My Head Is A Jungle", artist: "Wankelmut, Emma Louise, MK", genre: "House & Ibiza", dur: 239 },
-  { title: "One Day (Vandaag)", artist: "Bakermat", genre: "House & Ibiza", dur: 390 },
+  { title: "One Day (Vandaag)", artist: "Bakermat", genre: "House & Ibiza", dur: 219 },
   { title: "Prayer In C", artist: "Lily Wood and The Prick, Robin Schulz", genre: "House & Ibiza", dur: 208 },
   { title: "Rhythm Is A Dancer", artist: "Snap!", genre: "House & Ibiza", dur: 249 },
   { title: "The Rhythm of The Night", artist: "Corona", genre: "House & Ibiza", dur: 251 },
@@ -541,6 +549,208 @@ function showToast(msg) {
 
 // ─────────────────────────────────────────────
 // INIT
+
+// ─────────────────────────────────────────────
+// SAMPLE SETLISTS
+// ─────────────────────────────────────────────
+const SAMPLE_SETLISTS = [
+  {
+    name: "Reception Drinks 90m",
+    songs: [
+      { title: "If I Ain't Got You", artist: "Alicia Keys", dur: 228 },
+      { title: "Don't Know Why", artist: "Norah Jones", dur: 187 },
+      { title: "What A Wonderful World", artist: "Louis Armstrong", dur: 138 },
+      { title: "Stand By Me", artist: "Ben E. King", dur: 178 },
+      { title: "Close To You", artist: "The Carpenters", dur: 195 },
+      { title: "Can't Take My Eyes Off You", artist: "Andy Williams", dur: 202 },
+      { title: "L-O-V-E", artist: "Nat King Cole", dur: 157 },
+      { title: "Can't Help Falling In Love", artist: "Elvis Presley", dur: 181 },
+      { title: "My Girl", artist: "The Temptations", dur: 165 },
+      { title: "Thinking Out Loud", artist: "Ed Sheeran", dur: 281 },
+      { title: "Best Part", artist: "Daniel Caesar, H.E.R", dur: 257 },
+      { title: "So Easy (To Fall In Love)", artist: "Olivia Dean", dur: 198 },
+      { title: "Ordinary", artist: "Alex Warren", dur: 198 },
+      { title: "I'm Yours", artist: "Jason Mraz", dur: 243 },
+      { title: "Put Your Records On", artist: "Corinne Bailey Rae", dur: 227 },
+      { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", dur: 151 },
+      { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", dur: 236 },
+      { title: "Signed, Sealed, Delivered", artist: "Stevie Wonder", dur: 162 },
+      { title: "Let's Stay Together", artist: "Al Green", dur: 199 },
+      { title: "Isn't She Lovely", artist: "Stevie Wonder", dur: 198 },
+      { title: "Lovely Day", artist: "Bill Withers", dur: 261 },
+      { title: "Is This Love", artist: "Bob Marley", dur: 234 },
+      { title: "Rude", artist: "Magic!", dur: 214 },
+      { title: "Marry You", artist: "Bruno Mars", dur: 230 },
+      { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", dur: 229 },
+    ]
+  },
+  {
+    name: "Corporate Background 2hr",
+    songs: [
+      { title: "If I Ain't Got You", artist: "Alicia Keys", dur: 228 },
+      { title: "Best Part", artist: "Daniel Caesar, H.E.R", dur: 257 },
+      { title: "Thinking Out Loud", artist: "Ed Sheeran", dur: 281 },
+      { title: "Don't Know Why", artist: "Norah Jones", dur: 187 },
+      { title: "What A Wonderful World", artist: "Louis Armstrong", dur: 138 },
+      { title: "Stand By Me", artist: "Ben E. King", dur: 178 },
+      { title: "L-O-V-E", artist: "Nat King Cole", dur: 157 },
+      { title: "Let's Stay Together", artist: "Al Green", dur: 199 },
+      { title: "Close To You", artist: "The Carpenters", dur: 195 },
+      { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", dur: 236 },
+      { title: "Sir Duke", artist: "Stevie Wonder", dur: 230 },
+      { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", dur: 151 },
+      { title: "I Heard It Through The Grapevine", artist: "Marvin Gaye", dur: 230 },
+      { title: "Lovely Day", artist: "Bill Withers", dur: 261 },
+      { title: "Is This Love", artist: "Bob Marley", dur: 234 },
+      { title: "Shape of You", artist: "Ed Sheeran", dur: 234 },
+      { title: "Ordinary", artist: "Alex Warren", dur: 198 },
+      { title: "Lose Control", artist: "Teddy Swims", dur: 216 },
+      { title: "Stick Season", artist: "Noah Kahan", dur: 215 },
+      { title: "Riptide", artist: "Vance Joy", dur: 204 },
+      { title: "Beautiful Things", artist: "Benson Boone", dur: 218 },
+      { title: "I'm Yours", artist: "Jason Mraz", dur: 243 },
+      { title: "Better Together", artist: "Jack Johnson", dur: 207 },
+      { title: "Put Your Records On", artist: "Corinne Bailey Rae", dur: 227 },
+      { title: "So Easy (To Fall In Love)", artist: "Olivia Dean", dur: 198 },
+      { title: "Watermelon Sugar", artist: "Harry Styles", dur: 174 },
+      { title: "Sunday Morning", artist: "Maroon 5", dur: 270 },
+      { title: "Back on \'74", artist: "Jungle", dur: 211 },
+      { title: "Too Sweet", artist: "Hozier", dur: 219 },
+      { title: "Die With A Smile", artist: "Lady Gaga, Bruno Mars", dur: 251 },
+      { title: "Unwritten", artist: "Natasha Bedingfield", dur: 235 },
+      { title: "Man I Need", artist: "Olivia Dean", dur: 184 },
+      { title: "Where Is My Husband!", artist: "RAYE", dur: 198 },
+      { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", dur: 229 },
+    ]
+  },
+  {
+    name: "Upbeat 90m",
+    songs: [
+      { title: "24K Magic", artist: "Bruno Mars", dur: 226 },
+      { title: "I Gotta Feeling", artist: "Black Eyed Peas", dur: 289 },
+      { title: "Can't Stop The Feeling", artist: "Justin Timberlake", dur: 236 },
+      { title: "Man I Need", artist: "Olivia Dean", dur: 184 },
+      { title: "Where Is My Husband!", artist: "RAYE", dur: 198 },
+      { title: "One Last Time", artist: "Ariana Grande", dur: 215 },
+      { title: "One Kiss", artist: "Calvin Harris, Dua Lipa", dur: 213 },
+      { title: "I Could Get Used To This", artist: "Becky Hill & Weiss", dur: 194 },
+      { title: "Titanium", artist: "David Guetta / Sia", dur: 245 },
+      { title: "Lean On", artist: "Major Lazer & DJ Snake feat. M\u00d8", dur: 177 },
+      { title: "Jubel", artist: "Klingande", dur: 148 },
+      { title: "Sugar", artist: "Robin Schulz, Francesco Yates", dur: 196 },
+      { title: "Prayer In C", artist: "Lily Wood and The Prick, Robin Schulz", dur: 208 },
+      { title: "Sunshine", artist: "TIEKS, Dan Harkna", dur: 215 },
+      { title: "Despacito", artist: "Luis Fonsi, Daddy Yankee, Justin Bieber", dur: 229 },
+      { title: "Shape of You", artist: "Ed Sheeran", dur: 234 },
+      { title: "Cheerleader", artist: "OMI, Felix Jaehn", dur: 192 },
+      { title: "We Found Love", artist: "Rihanna, Calvin Harris", dur: 216 },
+      { title: "Wake Me Up", artist: "Avicii", dur: 247 },
+      { title: "Giant", artist: "Calvin Harris, Rag \'n\' Bone Man", dur: 215 },
+      { title: "Rather Be", artist: "Clean Bandit, Jess Glynne", dur: 248 },
+      { title: "Sax", artist: "Fleur East", dur: 236 },
+      { title: "Mr Saxobeat", artist: "Alexandra Stan", dur: 210 },
+      { title: "This Girl", artist: "Kungs, Cookin\' On 3 Burners", dur: 207 },
+      { title: "Love On Top", artist: "Beyonc\u00e9", dur: 268 },
+    ]
+  },
+  {
+    name: "Ibiza Sax Hour",
+    songs: [
+      { title: "Jubel", artist: "Klingande", dur: 148 },
+      { title: "One Day (Vandaag)", artist: "Bakermat", dur: 219 },
+      { title: "Dance With Me", artist: "Ehrling", dur: 199 },
+      { title: "Changes", artist: "Faul & Wad, PNAU", dur: 213 },
+      { title: "I Got U", artist: "Duke Dumont, Jax Jones", dur: 212 },
+      { title: "Are You With Me", artist: "Lost Frequencies", dur: 193 },
+      { title: "Prayer In C", artist: "Lily Wood and The Prick, Robin Schulz", dur: 208 },
+      { title: "Sugar", artist: "Robin Schulz, Francesco Yates", dur: 196 },
+      { title: "Sunshine", artist: "TIEKS, Dan Harkna", dur: 215 },
+      { title: "Waves", artist: "Mr. Probz, Robin Schulz", dur: 193 },
+      { title: "ily (I love you baby)", artist: "Surf Mesa / Emilee", dur: 185 },
+      { title: "Is This Love Remix", artist: "Bob Marley, LVNDSCAPE, Bolier", dur: 210 },
+      { title: "Dancing In The Moonlight", artist: "Jub\u00ebl, NEIMY", dur: 195 },
+      { title: "My Head Is A Jungle", artist: "Wankelmut, Emma Louise, MK", dur: 239 },
+      { title: "Hearts Ain\'t Gonna Lie", artist: "Arlissa, Jonas Blue, Eden Prince", dur: 210 },
+      { title: "Feel My Needs", artist: "WEISS, Purple Disco Machine", dur: 226 },
+      { title: "Sonnentanz Sun Don\'t Shine", artist: "Klangkarussell, Will Heard", dur: 300 },
+    ]
+  },
+  {
+    name: "Motown Hour",
+    songs: [
+      { title: "Ain't No Mountain High Enough", artist: "Marvin Gaye, Tammi Terrell", dur: 151 },
+      { title: "Best of My Love", artist: "The Emotions", dur: 222 },
+      { title: "Dancin\' In The Street", artist: "Martha and The Vandellas", dur: 148 },
+      { title: "Get Ready", artist: "The Temptations", dur: 160 },
+      { title: "I Can\'t Help Myself (Sugar Pie, Honey Bunch)", artist: "Four Tops", dur: 170 },
+      { title: "I Heard It Through The Grapevine", artist: "Marvin Gaye", dur: 230 },
+      { title: "I Wish", artist: "Stevie Wonder", dur: 246 },
+      { title: "Just The Two of Us", artist: "Grover Washington / Bill Withers", dur: 236 },
+      { title: "Let\'s Stay Together", artist: "Al Green", dur: 199 },
+      { title: "Lovely Day", artist: "Bill Withers", dur: 261 },
+      { title: "Move On Up", artist: "Curtis Mayfield", dur: 165 },
+      { title: "Reach Out (I\'ll Be There)", artist: "Four Tops", dur: 175 },
+      { title: "Sir Duke", artist: "Stevie Wonder", dur: 230 },
+      { title: "Stop! In The Name of Love", artist: "The Supremes", dur: 171 },
+      { title: "Sunny", artist: "Bobby Hebb", dur: 175 },
+      { title: "Sweet Love", artist: "Anita Baker", dur: 270 },
+      { title: "You Can\'t Hurry Love", artist: "The Supremes", dur: 165 },
+    ]
+  },
+];
+
+let activeSample = null;
+
+function renderSampleFilters() {
+  const wrap = document.getElementById('sample-filters');
+  wrap.innerHTML = SAMPLE_SETLISTS.map(s =>
+    `<button class="filter-chip ${activeSample === s.name ? 'active' : ''}" onclick="setSample('${s.name.replace(/'/g, "\\'")}')">${s.name}</button>`
+  ).join('');
+}
+
+function setSample(name) {
+  activeSample = activeSample === name ? null : name;
+  renderSampleFilters();
+  renderRepertoire();
+}
+
+function getSampleSongs() {
+  if (!activeSample) return null;
+  return SAMPLE_SETLISTS.find(s => s.name === activeSample);
+}
+
+function addAllSample() {
+  const sample = getSampleSongs();
+  if (!sample) return;
+
+  // Check if total would exceed limit
+  // Only count songs not already in setlist
+  const toAdd = sample.songs.filter(ss => {
+    const id = ss.title + '|' + ss.artist;
+    return !setlist.some(s => s.id === id);
+  });
+  const newTotal = totalSecs() + toAdd.reduce((a, s) => a + s.dur, 0);
+
+  if (newTotal > limitSeconds) {
+    showToast('Insufficient time remaining to add all songs — please add songs individually');
+    return;
+  }
+
+  toAdd.forEach(ss => {
+    const id = ss.title + '|' + ss.artist;
+    // Match against repertoire for linkedTitle etc
+    const rep = REPERTOIRE.find(r => r.title.toLowerCase() === ss.title.toLowerCase());
+    const song = rep
+      ? { ...rep, id: rep.title + '|' + rep.artist }
+      : { ...ss, id, genre: 'Sample' };
+    setlist.push(song);
+  });
+
+  updateAll();
+  const added = toAdd.length;
+  showToast(added > 0 ? `${added} song${added !== 1 ? 's' : ''} added` : 'All songs already in setlist');
+}
+
 // ─────────────────────────────────────────────
 // VERSION - reads Last-Modified header from GitHub Pages to show deploy time
 // ─────────────────────────────────────────────
@@ -575,6 +785,7 @@ function init() {
     document.title = `Setlist for ${clientName} – Elijah Paul`;
     renderRepertoire();
     renderGenreFilters();
+    renderSampleFilters();
     updateTimebar();
   }
 }
@@ -817,13 +1028,46 @@ function renderGenreFilters() {
 
 function setGenre(g) {
   activeGenre = g;
+  activeSample = null;
   renderGenreFilters();
+  renderSampleFilters();
   renderRepertoire();
 }
 
 function renderRepertoire() {
   const q = document.getElementById('rep-search').value.toLowerCase();
   const list = document.getElementById('rep-list');
+
+  // ── SAMPLE SETLIST MODE ──
+  const sample = getSampleSongs();
+  if (sample && !q) {
+    const totalSampleSecs = sample.songs.reduce((a, s) => a + s.dur, 0);
+    const mins = Math.floor(totalSampleSecs / 60), secs = totalSampleSecs % 60;
+    let html = `<div class="sample-header">
+      <span class="sample-name">${sample.name} &nbsp;<span style="font-weight:400;color:var(--muted);font-size:11px;">(${mins}:${String(secs).padStart(2,'0')} total)</span></span>
+      <button class="add-all-btn" onclick="addAllSample()">+ Add All</button>
+    </div>`;
+    sample.songs.forEach(ss => {
+      const id = ss.title + '|' + ss.artist;
+      const inSet = setlist.some(s => s.id === id) ||
+        (() => { const rep = REPERTOIRE.find(r => r.title.toLowerCase() === ss.title.toLowerCase()); return rep && rep.linkedTitle && setlist.some(s => s.linkedTitle === rep.linkedTitle); })();
+      const rep = REPERTOIRE.find(r => r.title.toLowerCase() === ss.title.toLowerCase());
+      const song = rep ? { ...rep, id: rep.title + '|' + rep.artist } : { ...ss, id, genre: 'Sample' };
+      const enc = JSON.stringify(song).replace(/"/g, '&quot;');
+      html += `<div class="song-item ${inSet ? 'in-setlist' : ''}" onclick="toggleSong(${enc})">
+        <div class="song-info">
+          <div class="song-title">${ss.title}</div>
+          <div class="song-artist">${ss.artist}</div>
+        </div>
+        <div class="song-right">
+          <span class="song-duration">${fmtTime(ss.dur)}</span>
+          <button class="add-btn ${inSet ? 'added' : ''}">${inSet ? '\u2713' : '+'}</button>
+        </div>
+      </div>`;
+    });
+    list.innerHTML = html;
+    return;
+  }
 
   let filtered = REPERTOIRE.filter(s => {
     const matchesGenre = activeGenre === 'All' || s.genre === activeGenre;
