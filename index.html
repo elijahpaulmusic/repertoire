@@ -315,6 +315,7 @@ let REPERTOIRE = [
   { title: "What a Wonderful World", artist: "Louis Armstrong", genre: "Soul & Motown", dur: 138, linkedTitle: "What a Wonderful World" },
   { title: "What's Going On", artist: "Marvin Gaye", genre: "Soul & Motown", dur: 235 },
   { title: "You Can't Hurry Love", artist: "The Supremes", genre: "Soul & Motown", dur: 165 },
+  { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Soul & Motown", dur: 209, linkedTitle: "You To Me Are Everything" },
 
   // Jazz — all 4:00 as requested
   { title: "A Night In Tunisia", artist: "", genre: "Jazz", dur: 240 },
@@ -412,7 +413,7 @@ let REPERTOIRE = [
   { title: "What A Wonderful World", artist: "Louis Armstrong", genre: "Chilled", dur: 138, linkedTitle: "What a Wonderful World" },
   { title: "Where Is My Husband!", artist: "RAYE", genre: "Chilled", dur: 198 },
   { title: "Wonderwall", artist: "Oasis", genre: "Chilled", dur: 258 },
-  { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Chilled", dur: 209 },
+  { title: "You To Me Are Everything", artist: "The Real Thing", genre: "Chilled", dur: 209, linkedTitle: "You To Me Are Everything" },
 
   // Pop / Upbeat
   { title: "24K Magic", artist: "Bruno Mars", genre: "Pop / Upbeat", dur: 226 },
@@ -462,6 +463,9 @@ let REPERTOIRE = [
   { title: "Yeah!", artist: "Usher", genre: "Pop / Upbeat", dur: 250 },
   { title: "Young Hearts Run Free", artist: "Candi Staton", genre: "Pop / Upbeat", dur: 212 },
   { title: "Valerie", artist: "Mark Ronson, Amy Winehouse", genre: "Pop / Upbeat", dur: 229, linkedTitle: "Valerie" },
+  { title: "Man I Need", artist: "Olivia Dean", genre: "Pop / Upbeat", dur: 184 },
+  { title: "Sax", artist: "Fleur East", genre: "Pop / Upbeat", dur: 236 },
+  { title: "I Could Get Used To This", artist: "Becky Hill & Weiss", genre: "Pop / Upbeat", dur: 194 },
 
   // House & Ibiza
   { title: "17", artist: "MK", genre: "House & Ibiza", dur: 356 },
@@ -508,6 +512,7 @@ let REPERTOIRE = [
   { title: "Wake Me Up", artist: "Avicii", genre: "House & Ibiza", dur: 247 },
   { title: "Waves", artist: "Mr. Probz, Robin Schulz", genre: "House & Ibiza", dur: 193 },
   { title: "What Is Love", artist: "Haddaway", genre: "House & Ibiza", dur: 216 },
+  { title: "Lean On", artist: "Major Lazer & DJ Snake feat. MØ", genre: "House & Ibiza", dur: 177 },
 
   // Garage
   { title: "A Little Bit of Luck", artist: "DJ Luck & MC Neal", genre: "Garage", dur: 201 },
@@ -695,6 +700,7 @@ const SAMPLE_SETLISTS = [
       { title: "Sunny", artist: "Bobby Hebb", dur: 175 },
       { title: "Sweet Love", artist: "Anita Baker", dur: 270 },
       { title: "You Can\'t Hurry Love", artist: "The Supremes", dur: 165 },
+      { title: "You To Me Are Everything", artist: "The Real Thing", dur: 209 },
     ]
   },
 ];
@@ -710,6 +716,8 @@ function renderSampleFilters() {
 
 function setSample(name) {
   activeSample = activeSample === name ? null : name;
+  if (activeSample) activeGenre = 'All';
+  renderGenreFilters();
   renderSampleFilters();
   renderRepertoire();
 }
