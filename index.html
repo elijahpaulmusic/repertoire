@@ -144,7 +144,7 @@
     .app-layout { grid-template-columns: 1fr; }
     .setlist-panel { position: fixed; bottom: 0; left: 0; right: 0; height: auto; max-height: 50vh; top: auto; border-top: 2px solid var(--border); z-index: 90; }
     .setlist-items { max-height: 200px; }
-    .browser { padding-bottom: 260px; }
+    .browser { padding-bottom: 420px; }
     header { padding: 0 16px; }
     .header-meta { gap: 12px; }
     .browser { padding: 20px 16px; }
@@ -483,7 +483,7 @@ let REPERTOIRE = [
   { title: "Cold Heart", artist: "Elton John, Dua Lipa, PNAU", genre: "House & Ibiza", dur: 213 },
   { title: "Dance With Me", artist: "Ehrling", genre: "House & Ibiza", dur: 199 },
   { title: "Dancing In The Moonlight", artist: "Jubël, NEIMY", genre: "House & Ibiza", dur: 195, linkedTitle: "Dancing In The Moonlight" },
-  { title: "Destination Calabria", artist: "Alex Gaudino, Crystal Waters", genre: "House & Ibiza", dur: 351 },
+  { title: "Destination Calabria", artist: "Alex Gaudino, Crystal Waters", genre: "House & Ibiza", dur: 223 },
   { title: "Dreamer", artist: "Livin' Joy, Janice Robinson", genre: "House & Ibiza", dur: 240 },
   { title: "Everybody Dance", artist: "Cedric Gervais, Franklin, Nile Rodgers", genre: "House & Ibiza", dur: 208 },
   { title: "Feel My Needs", artist: "WEISS, Purple Disco Machine", genre: "House & Ibiza", dur: 226 },
@@ -749,7 +749,7 @@ function addAllSample() {
   });
   const newTotal = totalSecs() + toAdd.reduce((a, s) => a + s.dur, 0);
 
-  if (newTotal > limitSeconds) {
+  if (newTotal > limitSeconds + 300) {
     showToast('Insufficient time remaining to add all songs — please add songs individually');
     return;
   }
