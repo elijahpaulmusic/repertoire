@@ -129,13 +129,13 @@
   .export-btn:hover { opacity: 0.8; }
   .export-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .export-note { font-size: 11px; color: var(--muted); text-align: center; }
-  .send-btn { width: 100%; padding: 12px; background: var(--success); color: var(--white); border: none; border-radius: 3px; font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-bottom: 8px; letter-spacing: 0.03em; }
-  .send-btn:hover { opacity: 0.85; }
-  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .send-note { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 8px; }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--white); padding: 10px 20px; border-radius: 100px; font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .no-results { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .sort-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .sort-label { font-family: 'Open Sans Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .sort-select { font-family: 'Open Sans Condensed', sans-serif; font-size: 13px; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 3px; background: var(--white); color: var(--ink); outline: none; cursor: pointer; flex: 1; transition: border-color 0.15s; }
+  .sort-select:focus { border-color: var(--gold); }
   .client-blurb { padding: 20px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
   .client-blurb p { font-family: 'Open Sans Condensed', sans-serif; font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 10px; }
   .client-blurb p:last-child { margin-bottom: 0; }
@@ -227,7 +227,6 @@
   .a-preview-box { background:var(--ink); border-radius:3px; padding:14px; font-family:'DM Mono',monospace; font-size:11px; color:#ccc; line-height:1.8; max-height:160px; overflow-y:auto; white-space:pre; }
   @media(max-width:768px){ .admin-layout{grid-template-columns:1fr;} .admin-main{padding:20px 16px;} .admin-header{padding:0 16px;} }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -308,6 +307,17 @@
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input class="search-input" id="rep-search" placeholder="Search repertoire…" oninput="activeSample=null; renderSampleFilters(); renderRepertoire()" />
         </div>
+        <div class="sort-row">
+          <span class="sort-label">Sort:</span>
+          <select class="sort-select" id="sort-select" onchange="setSort(this.value)">
+            <option value="song-asc">Song (A → Z)</option>
+            <option value="song-desc">Song (Z → A)</option>
+            <option value="artist-asc">Artist (A → Z)</option>
+            <option value="artist-desc">Artist (Z → A)</option>
+            <option value="dur-asc">Duration (Shortest first)</option>
+            <option value="dur-desc">Duration (Longest first)</option>
+          </select>
+        </div>
         <div class="section-label">Genres:</div>
         <div class="filters" id="rep-filters"></div>
         <div class="section-label" style="margin-top:16px">Sample Setlists:</div>
@@ -350,8 +360,6 @@
         </div>
       </div>
       <div class="setlist-footer">
-        <button class="send-btn" id="send-btn" onclick="sendSetlist()" disabled>Send Setlist to Elijah</button>
-        <div class="send-note" id="send-note">Sends your setlist directly to Elijah with a CSV ready for Spotify</div>
         <button class="export-btn" id="export-btn" onclick="exportSetlist()" disabled>Copy Setlist to Clipboard</button>
         <div class="export-note">Paste directly into your email and send to Elijah!</div>
 
@@ -653,6 +661,7 @@ const GENRE_ORDER = ["Wedding Reception Drinks","Motown","70s / 80s / 90s Pop","
 // STATE
 // ─────────────────────────────────────────────
 let setlist = [];
+let activeSort = 'song-asc';
 let limitSeconds = 45 * 60;
 let clientName = '';
 let activeGenre = 'All';
@@ -1375,6 +1384,24 @@ async function runUpdateRepertoire() {
 // ─────────────────────────────────────────────
 // REPERTOIRE RENDER
 // ─────────────────────────────────────────────
+function setSort(val) {
+  activeSort = val;
+  renderRepertoire();
+}
+
+function applySorting(songs) {
+  const sorted = [...songs];
+  switch (activeSort) {
+    case 'song-asc':  return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case 'song-desc': return sorted.sort((a, b) => b.title.localeCompare(a.title));
+    case 'artist-asc':  return sorted.sort((a, b) => (a.artist||'').localeCompare(b.artist||''));
+    case 'artist-desc': return sorted.sort((a, b) => (b.artist||'').localeCompare(a.artist||''));
+    case 'dur-asc':  return sorted.sort((a, b) => a.dur - b.dur);
+    case 'dur-desc': return sorted.sort((a, b) => b.dur - a.dur);
+    default: return songs;
+  }
+}
+
 function renderGenreFilters() {
   const wrap = document.getElementById('rep-filters');
   const all = ['All', ...GENRE_ORDER];
@@ -1404,7 +1431,8 @@ function renderRepertoire() {
       <span class="sample-name">${sample.name} &nbsp;<span style="font-weight:400;color:var(--muted);font-size:11px;">(${mins}:${String(secs).padStart(2,'0')} total)</span></span>
       <button class="add-all-btn" onclick="addAllSample()">+ Add All</button>
     </div>`;
-    sample.songs.forEach(ss => {
+    const sampleSongs = applySorting(sample.songs.map(ss => ss));
+    sampleSongs.forEach(ss => {
       const id = ss.title + '|' + ss.artist;
       const inSet = setlist.some(s => s.id === id) ||
         (() => { const rep = REPERTOIRE.find(r => r.title.toLowerCase() === ss.title.toLowerCase()); return rep && rep.linkedTitle && setlist.some(s => s.linkedTitle === rep.linkedTitle); })();
@@ -1447,7 +1475,8 @@ function renderRepertoire() {
   for (const genre of GENRE_ORDER) {
     if (!grouped[genre]) continue;
     if (activeGenre === 'All') html += `<div class="section-header">${genre}</div>`;
-    grouped[genre].forEach(song => {
+    const sortedGroup = applySorting(grouped[genre]);
+    sortedGroup.forEach(song => {
       const id = song.title + '|' + song.artist;
       const inSet = setlist.some(s => s.id === id) ||
         (song.linkedTitle && setlist.some(s => s.linkedTitle === song.linkedTitle));
@@ -1594,8 +1623,6 @@ function renderSetlistPanel() {
   const exportBtn = document.getElementById('export-btn');
   count.textContent = `${setlist.length} song${setlist.length !== 1 ? 's' : ''}`;
   exportBtn.disabled = setlist.length === 0;
-  const sendBtn = document.getElementById('send-btn');
-  if (sendBtn) sendBtn.disabled = setlist.length === 0;
   if (!setlist.length) {
     container.innerHTML = `<div class="setlist-empty"><div class="setlist-empty-icon">🎷</div><p>Your setlist is empty.<br>Browse the repertoire or search for songs above.</p></div>`;
     return;
@@ -1975,135 +2002,6 @@ function adminShowDebug(msg, isErr) {
 
 function adminEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ═══════════════════════════════════════════════
-// HARDCODED CONFIG — fill these in once, no storage needed
-// ═══════════════════════════════════════════════
-
-// ── EmailJS (get these from emailjs.com) ──
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';    // Account → General → Public Key
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';    // Email Services → Service ID
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';   // Email Templates → Template ID
-const ELIJAH_EMAIL        = 'YOUR@EMAIL.COM';     // Your email address
-
-// ── Spotify (from developer.spotify.com/dashboard) ──
-const SP_CLIENT_ID    = 'YOUR_SPOTIFY_CLIENT_ID';
-const SP_REDIRECT_URI = 'https://repertoire.elijahpaul.com?admin';
-
-// ── Admin password ──
-// (already defined below as ADMIN_PASSWORD)
-
-// ─────────────────────────────────────────────
-// BUILD CSV FROM SETLIST
-// Tries to match each song against master tracks stored by the admin tool
-// in localStorage, adding ISRC and Spotify ID for exact TuneMyMusic matching
-// ─────────────────────────────────────────────
-function buildCsvFromSetlist() {
-  // Load master tracks saved by the admin tool (same browser)
-  let masterTracks = [];
-  try {
-    masterTracks = adminMasterTracks; // use in-memory master tracks
-  } catch(e) {}
-
-  function normTitle(s) {
-    return (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
-  }
-
-  function findMaster(song) {
-    if (!masterTracks.length) return null;
-    const nt = normTitle(song.title);
-    // Exact title match first
-    for (const m of masterTracks) {
-      if (normTitle(m.title) === nt) return m;
-    }
-    // Partial match fallback
-    for (const m of masterTracks) {
-      const mt = normTitle(m.title);
-      if (mt.startsWith(nt) || nt.startsWith(mt)) return m;
-    }
-    return null;
-  }
-
-  function csvField(s) {
-    return '"' + (s || '').replace(/"/g, '\\"') + '"';
-  }
-
-  const rows = [['Track Name','Artist Name(s)','Album Name','ISRC','Spotify – id'].map(csvField).join(',')];
-  for (const song of setlist) {
-    const master = findMaster(song);
-    rows.push([
-      csvField(song.title),
-      csvField(song.artist || ''),
-      csvField(master ? (master.album || '') : ''),
-      csvField(master ? (master.isrc || '') : ''),
-      csvField(master ? (master.spotifyId || '') : ''),
-    ].join(','));
-  }
-  return rows.join('\n');
-}
-
-// ─────────────────────────────────────────────
-// SEND SETLIST — copies to clipboard AND emails CSV via EmailJS
-// ─────────────────────────────────────────────
-async function sendSetlist() {
-  const btn = document.getElementById('send-btn');
-  const note = document.getElementById('send-note');
-
-  // Build the plain-text setlist (same as exportSetlist)
-  const lines = [
-    `Setlist for ${clientName}`,
-    `Set duration: ${fmtTime(limitSeconds)}`,
-    `Total music: ${fmtTime(totalSecs())}`,
-    ``,
-    ...setlist.map((s, i) => `${i + 1}. ${s.title}${s.artist ? ' – ' + s.artist : ''} (${fmtTime(s.dur)})`)
-  ];
-  const setlistText = lines.join('\n');
-
-  // Copy to clipboard first so client gets confirmation immediately
-  try {
-    await navigator.clipboard.writeText(setlistText);
-  } catch(e) {}
-
-  // Build CSV
-  const csvContent = buildCsvFromSetlist();
-  const csvBase64 = btoa(unescape(encodeURIComponent(csvContent)));
-
-  // Send via EmailJS
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-  note.textContent = 'Sending your setlist to Elijah…';
-
-  try {
-    const pubKey   = EMAILJS_PUBLIC_KEY;
-    const svcId    = EMAILJS_SERVICE_ID;
-    const tplId    = EMAILJS_TEMPLATE_ID;
-    const toEmail  = ELIJAH_EMAIL;
-    emailjs.init(pubKey);
-    await emailjs.send(svcId, tplId, {
-      to_email: toEmail,
-      client_name:   clientName,
-      set_duration:  fmtTime(limitSeconds),
-      total_music:   fmtTime(totalSecs()),
-      song_count:    setlist.length,
-      setlist_text:  setlistText,
-      csv_content:   csvContent,
-      csv_filename:  clientName.replace(/[^a-zA-Z0-9\s&-]/g, '').trim() + '.csv',
-      tunemymusic_url: 'https://app.tunemymusic.com/transfer',
-      to_email:      ELIJAH_EMAIL,
-    });
-
-    btn.textContent = '✓ Setlist Sent to Elijah!';
-    btn.style.background = '#2d6e4a';
-    note.textContent = 'Your setlist has been sent. Elijah will be in touch soon!';
-    showToast('Setlist sent to Elijah and copied to clipboard!');
-
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Send Setlist to Elijah';
-    note.textContent = 'Send failed — please copy and email your setlist manually.';
-    showToast('Send failed — use Copy to Clipboard instead');
-    console.error('EmailJS error:', e);
-  }
-}
 
 init();
 </script>
